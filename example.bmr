@@ -1,0 +1,51 @@
+
+#include{handout.mrk}
+
+!gpath{figs}
+!beamer
+!begin
+
+
+!section MySectionHere
+!clr
+> OPENMW
+- this is an example
+!note dfasadfs1
+!note dfasadfs2
+!note dfasadfs32
+!note dfasadfs4
+
+
+
+!section deux
+!clr
+> OPENMW
+- this is an example
+!note dfasadfs1
+!note dfasadfs2
+!note dfasadfs32
+!note dfasadfs4
+
+
+
+!section MySectionHere
+!clr
+> OPENMW
+- this is an example
+!note dfasadfs1
+!note dfasadfs2
+!note dfasadfs32
+!note dfasadfs4
+
+
+
+!section deux
+!clr
+> OPENMW
+- this is an example
+!note dfasadfs1
+!note dfasadfs2
+!note dfasadfs32
+!note dfasadfs4
+
+
