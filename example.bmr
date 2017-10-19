@@ -32,6 +32,18 @@
 - this is an example
  
 
+!clr
+> New Slide
+- Item 1 
+- Item 2 
+- Item 3
+
+/*
+\chem{methane} \\ 
+\chem{methane}[formula] \\ 
+\chem{methane}[structure] \\ 
+*/
+
 
 
 /// you aren't obliged to use !enddoc, since unibeam will check it.
