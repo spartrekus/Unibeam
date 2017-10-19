@@ -1,51 +1,37 @@
 
-#include{beamer.mrk}
+////////////////////////
+// Unibeam is universal, safe, reliable !! 
+////////////////////////
 
+
+#include{beamer.mrk}
+// !gpath is a very useful function
 !gpath{figs}
+// !beamer will start beamer 
 !beamer
 !begin
 
 
+/// here a new slide, with a new section
 !section MySectionHere
 !clr
 > OPENMW
 - this is an example
 !note dfasadfs1
-!note dfasadfs2
-!note dfasadfs32
-!note dfasadfs4
 
 
 
-!section deux
+
+!section Second Section
 !clr
 > OPENMW
 - this is an example
-!note dfasadfs1
-!note dfasadfs2
-!note dfasadfs32
-!note dfasadfs4
-
-
-
-!section MySectionHere
-!clr
-> OPENMW
 - this is an example
-!note dfasadfs1
-!note dfasadfs2
-!note dfasadfs32
-!note dfasadfs4
-
-
-
-!section deux
-!clr
-> OPENMW
 - this is an example
-!note dfasadfs1
-!note dfasadfs2
-!note dfasadfs32
-!note dfasadfs4
+- this is an example
+- this is an example
+ 
 
 
+
+/// you aren't obliged to use !enddoc, since unibeam will check it.
