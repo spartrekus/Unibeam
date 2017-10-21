@@ -875,6 +875,7 @@ void nfileunimark( char *fileout, char *filein )
 
           // 20170811-180203
           // remove lf and more
+          // there is only two modifiers !
           for( fetchi = 0 ; ( fetchi <= strlen( fetchlinetmp ) ); fetchi++ )
             if ( fetchlinetmp[ fetchi ] != '\n' )
 	    {
@@ -889,8 +890,12 @@ void nfileunimark( char *fileout, char *filein )
           /////// txtrawcode, activated with !beginraw
           if ( txtrawcode == 1 )
           {
-             strncpy( fetchlinefoo, fetchline , PATH_MAX );
-             strncpy( fetchline ,   strtxt2tex( fetchlinefoo ) , PATH_MAX );
+             if ( fetchline[0] != '!' ) 
+             if ( fetchline[0] != '|' )  // there is only 2 modifiers
+             {
+                 strncpy( fetchlinefoo, fetchline , PATH_MAX );
+                 strncpy( fetchline , strtxt2tex( fetchlinefoo ) , PATH_MAX );
+             }
           }
 
 
