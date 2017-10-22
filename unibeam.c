@@ -1,6 +1,7 @@
 
 //////////////////////////////////
 //////////////////////////////////
+// 20171022-133121
 // 20170930-191237
 // 20171008-131355
 //////////////////////////////////
@@ -76,7 +77,8 @@ char myinputspath[PATH_MAX];
 
 
 
-int  markup_language = 1; // 1:english , 2:french, 3:german
+int markup_output_format = 1; // 1:tex, 2:html, 
+int markup_language = 1; // 1:english , 2:french, 3:german
 
 
 /////////////////////////////////
@@ -923,6 +925,8 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+            ///////////////////////////////////
+            ///////////////////////////////////
             //// !tex, quicker, faster and easier
             if ( foundcode == 0 )  // !btex 
             if ( fetchline[0] == '!' )
@@ -936,6 +940,20 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
               fputs( "\\begin{document}", fp5 );
   	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            } 
+
+            ///////////////////////////////////
+            ///////////////////////////////////
+            if ( foundcode == 0 )  //!bhtml 
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'b' )
+            if ( fetchline[2] == 'h' )
+            if ( fetchline[3] == 't' )
+            if ( fetchline[4] == 'm' )
+            if ( fetchline[5] == 'l' )
+            {
+              markup_output_format = 2;
   	      foundcode = 1;
             } 
 
@@ -1237,6 +1255,7 @@ void nfileunimark( char *fileout, char *filein )
             }
 
             ///////// FORCE RAW LOG  // !!: 
+            /*
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'l' ) 
             if ( fetchline[2] == 'o' ) 
@@ -1245,7 +1264,7 @@ void nfileunimark( char *fileout, char *filein )
             {
               // do nothing for the moment
   	      foundcode = 1;
-            }
+            } */
 
 
 
@@ -1286,12 +1305,13 @@ void nfileunimark( char *fileout, char *filein )
             /////////////////////////////////
             //// this is a possible function for set and co
             /////////////////////////////////
+            /*
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == ':' )
             {
   	      foundcode = 1;
-            }
+            } */
 
 
 
@@ -1375,7 +1395,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            // txtrawcode = 0; 
+            // !beginraw
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'b' )
@@ -1388,6 +1408,19 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[8] == 'w' )
             {
 	      txtrawcode = 1;
+  	      foundcode = 1;
+            }
+            // !endraw
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'e' )
+            if ( fetchline[2] == 'n' )
+            if ( fetchline[3] == 'd' )
+            if ( fetchline[4] == 'r' )
+            if ( fetchline[5] == 'a' )
+            if ( fetchline[6] == 'w' )
+            {
+	      txtrawcode = 0;
   	      foundcode = 1;
             }
 
@@ -2060,9 +2093,18 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[1] == '=' ) 
             if ( fetchline[2] == ' ' ) 
             {
- 	      fputs( "\\section{" , fp5 );
- 	      fputs( strtrim( strcut( fetchline, 2+2, strlen( fetchline ))) , fp5 );
-  	      fputs( "}\n", fp5 );
+              if ( markup_output_format == 2 )
+              {
+ 	        fputs( "<h1>" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "</h1>\n", fp5 );
+              }
+              else
+              {
+ 	        fputs( "\\section{" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "}\n", fp5 );
+              }
   	      foundcode = 1;
             }
             /////////////////////////////////////////////////////////////////
@@ -2074,9 +2116,18 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[2] == '=' ) 
             if ( fetchline[3] == ' ' ) 
             {
- 	      fputs( "\\subsection{" , fp5 );
- 	      fputs( strtrim( strcut( fetchline, 3+2, strlen( fetchline ))) , fp5 );
-  	      fputs( "}\n", fp5 );
+              if ( markup_output_format == 2 )
+              {
+ 	        fputs( "<h2>" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "</h2>\n", fp5 );
+              }
+              else
+              {
+    	        fputs( "\\subsection{" , fp5 );
+    	        fputs( strtrim( strcut( fetchline, 3+2, strlen( fetchline ))) , fp5 );
+     	        fputs( "}\n", fp5 );
+              }
   	      foundcode = 1;
             }
 
@@ -3669,10 +3720,22 @@ int main( int argc, char *argv[])
           printf( "STEP: unimark \n" );
           nfileunimark( argv[2] , argv[1] );
           printf( "STEP: fileappend \n" );
-          strncpy( targetfile, fbasenoext( argv[ 1 ] ) , PATH_MAX );
-          strncat( targetfile , ".tex" , PATH_MAX - strlen( targetfile ) -1 );
+
+          //strncpy( targetfile, fbasenoext( argv[ 1 ] ) , PATH_MAX );
+          //strncat( targetfile , ".tex" , PATH_MAX - strlen( targetfile ) -1 );
+
+          strncpy( targetfile,  argv[ 2 ]  , PATH_MAX );
           printf( "Target: %s\n" , targetfile );
-          if ( therebeginend == 0 )   fileappendend( targetfile );
+
+          if ( markup_output_format == 1 ) 
+            if ( therebeginend == 0 )  
+            {
+               printf( "File Append: End (TeX) \n" );
+               fileappendend( targetfile );
+            }
+          printf( "-End of Unimark/Unibearm (OK).-\n" );
+          printf( "===============================\n" );
+          printf( "\n" );
           return 0;
       }
 
@@ -3693,9 +3756,22 @@ int main( int argc, char *argv[])
           printf("  >SRC: %s => TRG: %s \n", argv[1] , targetfile  );
           filenew( targetfile );
           nfileunimark( targetfile , argv[1] );
-          if ( therebeginend == 0 )   fileappendend( targetfile );
+          //if ( therebeginend == 0 )   fileappendend( targetfile );
+
+          if ( markup_output_format == 1 ) 
+            if ( therebeginend == 0 )  
+            {
+               printf( "File Append: End (TeX) \n" );
+               fileappendend( targetfile );
+            }
+          printf( "-End of Unimark/Unibearm (OK).-\n" );
+          printf( "===============================\n" );
+          printf( "\n" );
+
           return 0;
       }
+
+
 
 
 
@@ -3705,13 +3781,6 @@ int main( int argc, char *argv[])
     return 0;
 
 }
-
-/*
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage{grffile}
-*/
 
 
 
