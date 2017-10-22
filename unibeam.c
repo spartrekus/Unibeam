@@ -1206,12 +1206,15 @@ void nfileunimark( char *fileout, char *filein )
             /// for easy text converting
             ////////////////
             ///////// FORCE RAW and add a line
+            /// for CSV or tables !!!!!!!!!!!!
+            /////////////////////////////////////
             if ( foundcode == 0 )
             if ( fetchline[0] == '|' )
             if ( fetchline[1] == '|' )
             if ( fetchline[2] == ' ' )
             {
- 	      fputs( strcsv2tex( strtxt2tex(  strcut(   fetchline , 2+2, strlen(  fetchline ))) ) , fp5 );
+ 	      //fputs( strcsv2tex( strtxt2tex(  strcut(   fetchline , 2+2, strlen(  fetchline ))) ) , fp5 );
+ 	      fputs( strcsv2tex(   strcut(   fetchline , 2+2, strlen(  fetchline )))  , fp5 );
   	      fputs( " ", fp5 );
   	      fputs( "\\", fp5 );
   	      fputs( "\\", fp5 );
@@ -2860,6 +2863,7 @@ void nfileunimark( char *fileout, char *filein )
             ////////////////
             /// for easy conv, with automatic line feed
             /// you can enter for intance:   |: this is line
+            /*
             if ( foundcode == 0 )
             if ( fetchcmdline[0] == '|' )
             if ( fetchcmdline[1] == ':' )
@@ -2870,7 +2874,7 @@ void nfileunimark( char *fileout, char *filein )
               fputs( "\\", fp5 );
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
-            }
+            } */
 
 
 	    /////////////////
