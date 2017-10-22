@@ -2774,7 +2774,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 	    /////////////////
-            if ( foundcode == 0 ) // !bold
+            if ( foundcode == 0 ) // sort of !bold with a linefeed i.e. >> item
             if ( fetchcmdline[0] == '>' )
             if ( fetchcmdline[1] == '>' )
             if ( fetchcmdline[2] == ' ' )
@@ -2785,6 +2785,27 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             }
+	    /////////////////
+            if ( foundcode == 0 ) // sort of !bold with a linefeed i.e. >> item
+            if ( fetchcmdline[0] == '!' )
+            if ( fetchcmdline[1] == '>' )
+            if ( fetchcmdline[2] == '>' )
+            if ( fetchcmdline[3] == ' ' )
+            {
+ 	      fputs( "{\\bfseries " , fp5 );
+ 	      fputs( strcut( fetchcmdline, 3+2, strlen(fetchcmdline)) , fp5 );
+  	      fputs( "\\\\}", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+
+
+
+
 
 	    /////////////////
 	    /////////////////
