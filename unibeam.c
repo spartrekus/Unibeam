@@ -3575,6 +3575,15 @@ int main( int argc, char *argv[])
     strncpy( myinputspath , "" , PATH_MAX );
     FILE *fpout;
 
+    ///////////////////////////////////////////
+    ///////////////////////////////////////////
+    ///////////////////////////////////////////
+    if ( argc == 2)
+    if ( strcmp( argv[ 1 ] , "--make"  ) == 0  ) 
+    {
+           system( " unibeam article.mrk article.tex ; pdflatex article ; bibtex article ; pdflatex article ; pdflatex article ; mupdf article.pdf " );
+           return 0;
+    }
 
 
    ///////////////////////////////////////////
