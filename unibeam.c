@@ -67,7 +67,11 @@
 /////////////////////////////////////////////////////////
 char slidebufferdata[200][PATH_MAX];
 char slidebufferfigfile[PATH_MAX];
+char slidebufferfigfile1[PATH_MAX];
+char slidebufferfigfile2[PATH_MAX];
+char slidebufferfignote[PATH_MAX];
 int  slidebufferfig=0;
+int  slidebuffernot=0;
 int  foxy = 0;
 
 
@@ -1973,8 +1977,22 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
-
-
+            // !not for beamer
+            if ( foundcode == 0 )
+	    if ( beamercode == 1 )
+	    if ( contentcode == 1 )
+	    if ( beamerlevel >= 1 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'n' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 't' )
+            if ( fetchline[4] == ' ' )
+            {
+              ///////////////
+              strncpy( slidebufferfignote,  strtrim( strcut( fetchline, 4+2, strlen( fetchline ))) , PATH_MAX );
+              slidebuffernot = 1;
+  	      foundcode = 1;
+            }
 
 
             // !fig for beamer
@@ -1998,8 +2016,36 @@ void nfileunimark( char *fileout, char *filein )
               }
               strncpy( slidebufferfigfile, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
   	      foundcode = 1;
+              slidebufferfig = 1; 
             }
 
+
+            // !figab for beamer
+            if ( foundcode == 0 )
+	    if ( beamercode == 1 )
+	    if ( contentcode == 1 )
+	    if ( beamerlevel >= 1 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'f' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'g' )
+            if ( fetchline[4] == 'a' )
+            if ( fetchline[5] == 'b' )
+            if ( fetchline[6] == '{' )
+            {
+              ///////////////
+              char foofilefound[PATH_MAX];
+              strncpy( foofilefound, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+              //if ( fexist( foofilefound ) == 1 ) 
+              if ( strstr( foofilefound , "/" ) != 0 ) 
+              {
+              }
+              //strncpy( slidebufferfigfile , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+              strncpy( slidebufferfigfile1 , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+              strncpy( slidebufferfigfile2 , strdelimit( fetchline,  '{' ,'}' ,  2 ) , PATH_MAX );
+  	      foundcode = 1;
+              slidebufferfig = 2; 
+            }
 
 
             // !maketitle
@@ -2105,11 +2151,14 @@ void nfileunimark( char *fileout, char *filein )
 	      {
                  fputs( slidebufferdata[ fooi ] , fp5 );
 
-                 if ( slidebufferfig == 1 )
+                 if ( slidebufferfig >= 1 )
                  if ( strcmp( slidebufferdata[ fooi ] , "\\begin{frame}" ) == 0 )
                  {
                       fputs( "\n" , fp5 );
-                      fputs( "\\fitimage{"  , fp5 );
+                      if ( slidebufferfig == 1 )
+                         fputs( "\\fitimage{"  , fp5 );
+                      else if ( slidebufferfig == 2 )
+                         fputs( "\\fitimageab{"  , fp5 );
                  }
 
                  if ( slidebufferfoundsection == 0 ) 
@@ -2118,7 +2167,6 @@ void nfileunimark( char *fileout, char *filein )
                       fputs(  "\\frametitle{\\thesection.~\\insertsection}"  , fp5 );
                       slidebufferfoundsection = 1; 
                  }
-
                  fputs( "\n" , fp5 );
 	      } // end of loop
 
@@ -2128,11 +2176,39 @@ void nfileunimark( char *fileout, char *filein )
                 foxy++;//
                 strncpy( slidebufferdata[foxy] , "}{" , PATH_MAX );
                 strncat( slidebufferdata[foxy] ,  slidebufferfigfile  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 ); 
-                strncat( slidebufferdata[foxy] , "}[]"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                //strncat( slidebufferdata[foxy] , "}[]"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+
+                strncat( slidebufferdata[foxy] , "}["  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                if ( slidebuffernot == 1 ) strncat( slidebufferdata[foxy] , slidebufferfignote  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                strncat( slidebufferdata[foxy] , "]"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+
                 fooi = foxy ; 
                 fputs( slidebufferdata[ fooi ] , fp5 );
                 fputs( "\n" , fp5 );
+                slidebufferfig=0;
 	      }
+              else if ( slidebufferfig == 2 )
+	      {
+                foxy++;//
+                strncpy( slidebufferdata[foxy] , "}{" , PATH_MAX );
+                strncat( slidebufferdata[foxy] ,  slidebufferfigfile1  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 ); 
+                strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+
+                //strncpy( slidebufferdata[foxy] , "{" , PATH_MAX );
+                strncat( slidebufferdata[foxy] ,  "{"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 ); 
+                strncat( slidebufferdata[foxy] ,  slidebufferfigfile2  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 ); 
+                //strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+
+                strncat( slidebufferdata[foxy] , "}["  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                if ( slidebuffernot == 1 ) strncat( slidebufferdata[foxy] , slidebufferfignote  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                strncat( slidebufferdata[foxy] , "]"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+
+                fooi = foxy ; 
+                fputs( slidebufferdata[ fooi ] , fp5 );
+                fputs( "\n" , fp5 );
+                slidebufferfig=0;
+	      }
+
               /// close the frame
  	      fputs( "\\end{frame}\n" , fp5 );
  	      fputs( "\n" , fp5 );
@@ -2141,6 +2217,7 @@ void nfileunimark( char *fileout, char *filein )
               /// reset slide values
               foxy = 0;
               slidebufferfig=0;
+              slidebuffernot=0;
               strncpy( slidemysection, "", PATH_MAX );
 
 	      beamerlevel = 0;
