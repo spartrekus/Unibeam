@@ -1983,13 +1983,14 @@ void nfileunimark( char *fileout, char *filein )
 	    if ( contentcode == 1 )
 	    if ( beamerlevel >= 1 )
             if ( fetchline[0] == '!' )
-            if ( fetchline[1] == 'n' )
-            if ( fetchline[2] == 'o' )
-            if ( fetchline[3] == 't' )
-            if ( fetchline[4] == ' ' )
+            if ( fetchline[1] == 'i' )
+            if ( fetchline[2] == 'n' )
+            if ( fetchline[3] == 'f' )
+            if ( fetchline[4] == 'o' )
+            if ( fetchline[5] == ' ' )
             {
               ///////////////
-              strncpy( slidebufferfignote,  strtrim( strcut( fetchline, 4+2, strlen( fetchline ))) , PATH_MAX );
+              strncpy( slidebufferfignote,  strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , PATH_MAX );
               slidebuffernot = 1;
   	      foundcode = 1;
             }
