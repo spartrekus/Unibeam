@@ -178,40 +178,6 @@ char *strtxt2tex(char *str)
 	}
 
 
-  /*
-        else if ( str[i] == '°' ) 
-	{ 
-          ptr[j++]='{';
-          ptr[j++]='\\';
-          ptr[j++]='^';
-          ptr[j++]='\\';
-          ptr[j++]='c';
-          ptr[j++]='i';
-          ptr[j++]='r';
-          ptr[j++]='c';
-          ptr[j++]='}';
-	}
-
-        else if ( str[i] == 'ä' ) 
-	{ 
-          ptr[j++]='{';
-          ptr[j++]='\\';
-          ptr[j++]='"';
-          ptr[j++]='a';
-          ptr[j++]='}';
-	}
-   */
-
-
-        /* else if ( str[i] == '' )  <-- mu here !
-	{
-          ptr[j++]='$';
-          ptr[j++]='\\';
-          ptr[j++]='m';
-          ptr[j++]='u';
-          ptr[j++]='$';
-	} */
-
         else if ( str[i] == '}' ) 
 	{
           ptr[j++]='\\';
@@ -1977,7 +1943,7 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
-            // !not for beamer
+            // !info bla for beamer
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
@@ -1991,6 +1957,34 @@ void nfileunimark( char *fileout, char *filein )
             {
               ///////////////
               strncpy( slidebufferfignote,  strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , PATH_MAX );
+              slidebuffernot = 1;
+  	      foundcode = 1;
+            }
+
+            // !info{ for beamer
+            if ( foundcode == 0 )
+	    if ( beamercode == 1 )
+	    if ( contentcode == 1 )
+	    if ( beamerlevel >= 1 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'i' )
+            if ( fetchline[2] == 'n' )
+            if ( fetchline[3] == 'f' )
+            if ( fetchline[4] == 'o' )
+            if ( fetchline[5] == '{' )
+            {
+              ///////////////
+              //strncpy( slidebufferfignote,  strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , PATH_MAX );
+              strncpy( slidebufferfignote,  ""  , PATH_MAX );
+              strncat( slidebufferfignote , "{\\small " , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+              strncat( slidebufferfignote , fbasenoext( strtxt2tex( strdelimit( fetchline,  '{' ,'}' ,  1 ) )) , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+
+              strncat( slidebufferfignote , " (Left) and " , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+
+              strncat( slidebufferfignote , fbasenoext(strtxt2tex( strdelimit( fetchline,  '{' ,'}' ,  2 ) ) ) , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+
+              strncat( slidebufferfignote , " (Right)" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+              strncat( slidebufferfignote , "}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
               slidebuffernot = 1;
   	      foundcode = 1;
             }
