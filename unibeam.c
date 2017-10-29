@@ -3967,6 +3967,15 @@ int cat_fdinfo( char *filein )
 
 
 
+//////////////////////////////
+ void npdflatex( char *thefile ) 
+ {
+       char tfileout[PATH_MAX];
+       strncpy( tfileout ,   fbasenoext( thefile ) , PATH_MAX );
+       strncat( tfileout , ".tex" , PATH_MAX - strlen( tfileout ) -1 );
+       nrunwith( " unibeam ", thefile );
+       nrunwith( " pdflatex -shell-escape ", tfileout );
+ }
 
 //////////////////////////////
  void ntexmake( char *thefile , int ntexmakemode )
@@ -4046,6 +4055,20 @@ int main( int argc, char *argv[])
           {
 	    printf( "%d/%d: %s\n", i, argc-1 ,  argv[ i ] );
             if ( fexist( argv[ i ] ) == 1 ) ntexmake( argv[ i ] , 2 );
+          }
+          return 0;
+    }
+
+
+
+    if ( argc >= 2)
+    if ( strcmp( argv[ 1 ] , "--pdflatex"  ) == 0  ) 
+    {
+          for( i = 2 ; i < argc ; i++) 
+          {
+	    printf( "%d/%d: %s\n", i, argc-1 ,  argv[ i ] );
+            if ( fexist( argv[ i ] ) == 1 ) 
+                npdflatex( argv[ i ] );
           }
           return 0;
     }
