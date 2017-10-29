@@ -1329,6 +1329,8 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+
+
             //////////////////////////////////
             //// !packages
             if ( foundcode == 0 )
@@ -1342,13 +1344,15 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( "\\usepackage{graphicx}\n" , fp5 );
  	      fputs( "\\usepackage{grffile}\n" , fp5 );
  	      fputs( "\n" , fp5 );
-  	         fputs( "\n", fp5 );
                  fputs( "\\usepackage{color,soul}\n", fp5 );
                  fputs( "\\setlength\\parindent{0pt} \n", fp5 );
                  fputs( "\\usepackage[parfill]{parskip}\n", fp5 );
                  fputs( "\\sloppy\n", fp5 );
                  fputs( "\\usepackage[none]{hyphenat}\n", fp5 );
                  fputs( "\\usepackage{microtype}\n", fp5 );
+                 fputs( "\n", fp5 );
+                 fputs( "%%%%\\pagestyle{headings}\n", fp5 );
+                 fputs( "\n", fp5 );
   	         foundcode = 1;
             } 
 
@@ -4071,6 +4075,7 @@ int main( int argc, char *argv[])
             fputs( "!gpath{figs}\n", fpout );
             fputs( "!ipath{~/pool/mrkdir/}\n", fpout );
             fputs( "// \\usepackage[margin=0.5cm]{geometry}\n", fpout );
+            fputs( "// \\pagestyle{headings}\n", fpout );
             fputs( "!begin\n", fpout );
             fputs( "!bold Example \n", fpout );
             fputs( "// \\begin{center}\n", fpout );
