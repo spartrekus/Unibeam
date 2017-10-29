@@ -1,6 +1,7 @@
 
 //////////////////////////////////
 //////////////////////////////////
+// 20171027-210858
 // 20171026-153458
 // 20171022-133121
 // 20170930-191237
@@ -3934,25 +3935,28 @@ int cat_fdinfo( char *filein )
 
 
 //////////////////////////////
- void ntexmake( char *thefile )
+ void ntexmake( char *thefile , int ntexmakemode )
  {
+       ///////////////////////////
+       /*
+       unibeam article.mrk article.tex 
+       pdflatex article ;
+       bibtex article 
+       pdflatex article 
+       pdflatex article 
+       mupdf article.pdf   */
+       //strncpy( theout, strtimestamp() , PATH_MAX );
+       //char theout[PATH_MAX];
+       ///////////////////////////
        char targetfile[PATH_MAX];
        char tfilein[PATH_MAX];
        char tfileout[PATH_MAX];
        char cmdi[PATH_MAX];
-        /*
-        unibeam article.mrk article.tex 
-        pdflatex article ;
-        bibtex article 
-        pdflatex article 
-        pdflatex article 
-        mupdf article.pdf   */
-       //strncpy( theout, strtimestamp() , PATH_MAX );
-       //char theout[PATH_MAX];
          strncpy( targetfile, fbasenoext( thefile ) , PATH_MAX );
-         strncpy( tfileout, fbasenoext( thefile ) , PATH_MAX );
+         strncpy( tfileout,   fbasenoext( thefile ) , PATH_MAX );
          strncat( tfileout , ".pdf" , PATH_MAX - strlen( tfileout ) -1 );
-         nrunwith( " unibeam ",  thefile );
+         if ( ntexmakemode == 1 )       nrunwith( " unibeam ",  thefile );
+         else if ( ntexmakemode == 2 )  nrunwith( " ./unibeam ",  thefile );
          nrunwith( " pdflatex ", targetfile );
          nrunwith( " bibtex ",   targetfile );
          nrunwith( " pdflatex ", targetfile );
@@ -3982,18 +3986,38 @@ int main( int argc, char *argv[])
     strncpy( mygraphicspath, "" , PATH_MAX );
     strncpy( myinputspath , "" , PATH_MAX );
     FILE *fpout;
+    int i ; 
+
 
     ///////////////////////////////////////////
     ///////////////////////////////////////////
     ///////////////////////////////////////////
+    //system( " unibeam article.mrk article.tex ; pdflatex article ; bibtex article ; pdflatex article ; pdflatex article ; mupdf article.pdf " );
+    // you may visit for examples: https://github.com/spartrekus/Unibeam-Article-Example
     if ( argc >= 2)
     if ( strcmp( argv[ 1 ] , "--make"  ) == 0  ) 
     {
-           //system( " unibeam article.mrk article.tex ; pdflatex article ; bibtex article ; pdflatex article ; pdflatex article ; mupdf article.pdf " );
-           // you may visit for examples: https://github.com/spartrekus/Unibeam-Article-Example
-           if ( fexist( argv[ 2 ] ) == 1 ) ntexmake( argv[ 2 ] );
-           return 0;
+          for( i = 2 ; i < argc ; i++) 
+          {
+	    printf( "%d/%d: %s\n", i, argc-1 ,  argv[ i ] );
+            if ( fexist( argv[ i ] ) == 1 ) ntexmake( argv[ i ] , 1 );
+          }
+          return 0;
     }
+    //////////////////////////////////////////
+    if ( argc >= 2)
+    if ( strcmp( argv[ 1 ] , "--local-make"  ) == 0  ) 
+    {
+          for( i = 2 ; i < argc ; i++) 
+          {
+	    printf( "%d/%d: %s\n", i, argc-1 ,  argv[ i ] );
+            if ( fexist( argv[ i ] ) == 1 ) ntexmake( argv[ i ] , 2 );
+          }
+          return 0;
+    }
+
+
+
 
 
    ///////////////////////////////////////////
