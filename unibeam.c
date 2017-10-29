@@ -307,7 +307,7 @@ int txtbeginreview = 0;
 int txtrawcode = 0; 
 int beamercode = 0; 
 int contentcode = 0; 
-int option_system_call = 1;           // this will be 0 by default
+int option_system_call = 0;           // this will be 0 by default (depreciated)
 int option_strtxt2tex_linefeed = 0;   // this shall be 0 by default for compact documents
 
 
@@ -1336,6 +1336,12 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchcmdline[0] == '!' )
 	    if ( strcmp( fetchcmdline, "!packages" ) == 0 )
             {
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\\usepackage{url}\n" , fp5 );
+ 	      fputs( "\\usepackage{hyperref}\n" , fp5 );
+ 	      fputs( "\\usepackage{graphicx}\n" , fp5 );
+ 	      fputs( "\\usepackage{grffile}\n" , fp5 );
+ 	      fputs( "\n" , fp5 );
   	         fputs( "\n", fp5 );
                  fputs( "\\usepackage{color,soul}\n", fp5 );
                  fputs( "\\setlength\\parindent{0pt} \n", fp5 );
@@ -2398,7 +2404,8 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            ///////////// regular fig
+            ///////////// !fig{myfigure.png} regular fig 
+            ///////////// the regular fig to place figures 
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'f' )
@@ -2435,6 +2442,30 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+
+
+
+
+
+            ///////////// !fig fig.png Quick fig !! (workaround)
+            ///////////// !fig myfigure.png  //this is a fast fig 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'f' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'g' )
+            if ( fetchline[4] == ' ' )
+            {
+  	        fputs( "\\begin{center}\n", fp5 );
+  	        fputs( "\\includegraphics[width=1.0\\textwidth]{" , fp5 );
+ 	        //fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+ 	        //fputs(  strsplit(    strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        fputs( "\\end{center}\n", fp5 );
+  	      foundcode = 1;
+            }
+
 
 
 
@@ -3791,7 +3822,6 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
-  //////]]] 
 
 
 
@@ -4122,19 +4152,18 @@ int main( int argc, char *argv[])
     if ( argc == 2)
     if ( ( strcmp( argv[1] , "--readme" ) ==  0 ) 
     || ( strcmp( argv[1] , "--help" ) ==  0 ) 
-    || ( strcmp( argv[1] , "-help" ) ==  0 ) 
-    )
-    if ( option_system_call == 1 )
+    || ( strcmp( argv[1] , "-help" ) ==  0 ) )
     {
+        
 	 show_unimark_logo();
-	 printf( "Fetch the readme for Unimark ?\n" );
-         if ( question_continue() == 1 )
-	 {
-	    if ( option_system_call == 1 )
-              system( " curl  \"https://raw.githubusercontent.com/spartrekus/Unimark/master/README.md\"  >> unimark.readme ") ; 
-	     if ( fexist( "unimark.readme" ) == 1 )
-	      ncat_static( "unimark.readme" );
-	 }
+// 	 printf( "Fetch the readme for Unimark ?\n" );
+//          if ( question_continue() == 1 )
+// 	 {
+// 	    if ( option_system_call == 1 )
+//               system( " curl  \"https://raw.githubusercontent.com/spartrekus/Unimark/master/README.md\"  >> unimark.readme ") ; 
+// 	     if ( fexist( "unimark.readme" ) == 1 )
+// 	      ncat_static( "unimark.readme" );
+// 	 }
          return 0;
     }
 
