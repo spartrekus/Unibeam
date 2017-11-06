@@ -661,6 +661,8 @@ char *fbasename(char *name)
 
 
 
+
+//////////////////////////////////
 char *fextension(char *str)
 { 
       char ptr[strlen(str)+1];
@@ -1312,6 +1314,7 @@ void nfileunimark( char *fileout, char *filein )
             // \usepackage{hyperref}
             // \usepackage{graphicx}
             // \usepackage{grffile}
+            //  xcolor ? for xfig fig2dev
             /////////////////////////////////
             /////////////////////////////////
             if ( foundcode == 0 )   // !gfx 
@@ -1325,6 +1328,7 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( "\\usepackage{hyperref}\n" , fp5 );
  	      fputs( "\\usepackage{graphicx}\n" , fp5 );
  	      fputs( "\\usepackage{grffile}\n" , fp5 );
+ 	      fputs( "\\usepackage{xcolor}\n" , fp5 );
  	      fputs( "\n" , fp5 );
   	      foundcode = 1;
             }
@@ -2401,6 +2405,35 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
+
+            ///////////// !figab{myfigure.png} regular fig 
+            ///////////// the regular figab to place figures side by side
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'f' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'g' )
+            if ( fetchline[4] == 'a' )
+            if ( fetchline[5] == 'b' )
+            if ( fetchline[6] == '{' )
+            {
+  	        fputs( "\\begin{center}\n", fp5 );
+  	        fputs( "\\begin{figure}\n", fp5 );
+  	        fputs( "\\centering\n", fp5 );
+  	        fputs( "\\includegraphics[width=0.48\\linewidth]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        fputs( "~\n", fp5 );
+  	        fputs( "\\includegraphics[width=0.48\\linewidth]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  2 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        fputs( "\\end{figure}\n", fp5 );
+  	        fputs( "\\end{center}\n", fp5 );
+  	        foundcode = 1;
+            }
 
 
 
@@ -4030,6 +4063,17 @@ int main( int argc, char *argv[])
     strncpy( myinputspath , "" , PATH_MAX );
     FILE *fpout;
     int i ; 
+
+    //////////////////////////////////////////
+    if ( argc >= 2)
+    if ( strcmp( argv[ 1 ] , "--debug"  ) == 0  ) 
+    if ( strcmp( argv[ 2 ] , "hello"  ) == 0  ) 
+    {
+	  printf( "(Unibeam Command For Dev - Debug.)\n" );
+	  printf( "Hello World\n" );
+          return 0; 
+    }
+
 
 
     ///////////////////////////////////////////
