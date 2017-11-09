@@ -306,9 +306,12 @@ return fileordir;
 int txtbeginreview = 0; 
 int txtrawcode = 0; 
 int beamercode = 0; 
+int notercode  = 0; 
 int contentcode = 0; 
 int option_system_call = 0;           // this will be 0 by default (depreciated)
-int option_strtxt2tex_linefeed = 0;   // this shall be 0 by default for compact documents
+
+int option_strtxt2tex_linefeed = 1;   // this shall be 0 by default for compact documents
+             // but ok, let's try with 1
 
 
 
@@ -1491,6 +1494,173 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
+   ////////////////////////////////////////
+   ////////////////////////////////////////
+   //////// INCLUDE AND INPUT HERE (START)
+   ////////////////////////////////////////
+   ////////////////////////////////////////
+  // =====================================================
+  // =====================================================
+  //  INCLUDEs...
+  // =====================================================
+  // =====================================================
+            // !input has even ~ now 
+            //( ( fetchline[0] == '!' )
+            if ( foundcode == 0 )
+	    if ( 
+            ( fetchline[0] ==  '!' ) 
+            && ( fetchline[1] == 'i' )
+            && ( fetchline[2] == 'n' )
+            && ( fetchline[3] == 'p' )
+            && ( fetchline[4] == 'u' )
+            && ( fetchline[5] == 't' )
+            && ( fetchline[6] == '{' )
+	    )
+            {
+ 	      //fputs( strbraket( fetchline ) , fp5 );
+ 	      //fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+              fclose( fp5 );                 /// writer
+              long saved = ftell( fp6 );     /// reader
+              fclose( fp6 );                 /// reader
+
+              printf( ">COMMAND INPUT<\n"); 
+	      char fileinputsrc[PATH_MAX];
+	      strncpy( fileinputsrc,  myinputspath , PATH_MAX );
+              strncat( fileinputsrc , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+              printf( ">COMMAND INPUT Src %s<\n", fileinputsrc ); 
+
+	        if ( fileinputsrc[0] == '~' )
+	        {
+	         strncpy( fileinputsrc, "" , PATH_MAX );
+                 strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+                 strncat( fileinputsrc , strdelimit( fetchline,  '~' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+	        }
+                //filetexiex( fileout, strdelimit( fetchline,  '{' ,'}' ,  1 ) );
+		printf( "!input{%s} (fexist:%d) (...)\n", fileinputsrc , fexist( fileinputsrc ) );
+                printf( "> READ FROM IPATH: %s\n", myinputspath );
+                nfileunimark( fileout, fileinputsrc );
+              fp5 = fopen( fileout , "ab+"); /// writer
+              fp6 = fopen( filein , "r");  /// reader
+              fseek( fp6 , saved , SEEK_SET); // reader 
+  	      foundcode = 1;
+            }
+
+
+            //////////////////
+            if ( foundcode == 0 )
+	    if ( 
+            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
+            && ( fetchline[1] == 'i' )
+            && ( fetchline[2] == 'n' )
+            && ( fetchline[3] == 'c' )
+            && ( fetchline[4] == 'l' )
+            && ( fetchline[5] == 'u' )
+            && ( fetchline[6] == 'd' )
+            && ( fetchline[7] == 'e' )
+            && ( fetchline[8] == '{' )
+	    )
+            {
+              fclose( fp5 );                 /// writer
+              long saved = ftell( fp6 );     /// reader
+              fclose( fp6 );                 /// reader
+
+	      char fileinputsrc[PATH_MAX];
+	      strncpy( fileinputsrc, "", PATH_MAX );
+              strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+              strncat( fileinputsrc , "/include/mrk/" , PATH_MAX - strlen( fileinputsrc ) -1 );
+              strncat( fileinputsrc , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+ 	      printf( " =>!include{%s} (fexist:%d) (...)\n", fileinputsrc , fexist( fileinputsrc ) );
+              nfileunimark( fileout, fileinputsrc );
+              fp5 = fopen( fileout , "ab+"); /// writer
+              fp6 = fopen( filein , "r");  /// reader
+              fseek( fp6 , saved , SEEK_SET); // reader 
+  	      foundcode = 1;
+            }
+
+
+            if ( foundcode == 0 )
+	    if ( 
+            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
+            && ( fetchline[1] == 'i' )
+            && ( fetchline[2] == 'n' )
+            && ( fetchline[3] == 'c' )
+            && ( fetchline[4] == 'l' )
+            && ( fetchline[5] == 'u' )
+            && ( fetchline[6] == 'd' )
+            && ( fetchline[7] == 'e' )
+            && ( fetchline[8] == ' ' )
+            && ( ( fetchline[9] == '<' ) || ( ( fetchline[9] == '"' ) ) )
+	    )
+            {
+              fclose( fp5 );                 /// writer
+              long saved = ftell( fp6 );     /// reader
+              fclose( fp6 );                 /// reader
+
+	      char fileinputsrc[PATH_MAX];
+
+	      strncpy( fileinputsrc, "", PATH_MAX );
+              if ( fetchline[9] == '<' )  
+              {
+                strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+                strncat( fileinputsrc , "/include/mrk/" , PATH_MAX - strlen( fileinputsrc ) -1 );
+                strncat( fileinputsrc , strdelimit( fetchline,  '<' ,'>' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+              }
+              else if ( fetchline[9] == '"' )  
+              {
+                strncat( fileinputsrc , strdelimit( fetchline,  '"' ,'"' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+              }
+
+ 	      printf( " =>!include{%s} (fexist:%d) (...)\n", fileinputsrc , fexist( fileinputsrc ) );
+              FILE *fpbis ;
+              fpbis = fopen( "pdflatex.log" , "ab+" );
+                fputs( "Input:", fpbis );
+                fputs( fileinputsrc, fpbis );
+                fputs( "\n" , fpbis );
+              fclose( fpbis );
+
+              nfileunimark( fileout, fileinputsrc );
+              fp5 = fopen( fileout , "ab+"); /// writer
+              fp6 = fopen( filein , "r");  /// reader
+              fseek( fp6 , saved , SEEK_SET); // reader 
+  	      foundcode = 1;
+            }
+   ////////////////////////////////////////
+   ////////////////////////////////////////
+   //////// INCLUDE AND INPUT HERE (END)
+   ////////////////////////////////////////
+   ////////////////////////////////////////
+
+
+
+	    /////////////////
+            if ( foundcode == 0 )
+            if ( fetchcmdline[0] == '!' )
+	    if ( strcmp( fetchcmdline, "!begin" ) == 0 )
+            {
+	      contentcode = 1;
+ 	      fputs( "\\begin{document}" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+            ////////////////
+            if ( foundcode == 0 )
+            if ( fetchcmdline[0] == '!' )
+	    if ( strcmp( fetchcmdline, "!enddoc" ) == 0 )
+            {
+	      contentcode = 0;
+ 	      fputs( "\\end{document}" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+
+
             //// !beamer
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
@@ -1504,9 +1674,20 @@ void nfileunimark( char *fileout, char *filein )
 	      beamercode = 1;
   	      foundcode = 1;
             }
-              //foxy++;//
-              //strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
-              //strncat( slidebufferdata[foxy] , "%%%% beamer"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+            //// !noter
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'n' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 't' )
+            if ( fetchline[4] == 'e' )
+            if ( fetchline[5] == 'r' )
+            {
+	      notercode = 1;
+  	      foundcode = 1;
+            }
+
+
 
 
 /////////////////////////////////////////////////////////////
@@ -2246,6 +2427,112 @@ void nfileunimark( char *fileout, char *filein )
      // end of beamer
      // end of beamer
      // end of beamer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            /////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////
+            if ( notercode == 1 ) 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == '=' ) 
+            if ( fetchline[2] == ' ' ) 
+            {
+ 	        fputs( "\\section{" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	      foundcode = 1;
+            }
+            /////////////////////////////
+            if ( notercode == 1 ) 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 's' ) 
+            if ( fetchline[2] == 'e' ) 
+            if ( fetchline[3] == 'c' ) 
+            if ( fetchline[4] == 't' ) 
+            if ( fetchline[5] == 'i' ) 
+            if ( fetchline[6] == 'o' ) 
+            if ( fetchline[7] == 'n' ) 
+            if ( fetchline[8] == ' ' ) 
+            {
+ 	        fputs( "\\section{" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 8+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	      foundcode = 1;
+            }
+            /////////////////////////////
+            if ( notercode == 1 ) 
+            if ( foundcode == 0 ) // !note bla   , activated with !noter 
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'n' ) 
+            if ( fetchline[2] == 'o' ) 
+            if ( fetchline[3] == 't' ) 
+            if ( fetchline[4] == 'e' ) 
+            if ( fetchline[5] == ' ' ) 
+            {
+  	      fputs( "- ", fp5 );
+ 	      fputs( strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , fp5 );
+  	      fputs( "\\\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
+            /////////////////////////////
+            if ( notercode == 1 ) 
+            if ( foundcode == 0 ) 
+            if ( fetchline[0] == '\\' ) 
+            if ( fetchline[1] == 'm' ) 
+            if ( fetchline[2] == 'y' ) 
+            if ( fetchline[3] == 's' ) 
+            if ( fetchline[4] == 'e' ) 
+            if ( fetchline[5] == 'c' ) 
+            if ( fetchline[6] == 't' ) 
+            if ( fetchline[7] == 'i' ) 
+            if ( fetchline[8] == 'o' ) 
+            if ( fetchline[9] == 'n' ) 
+            if ( fetchline[10] == '{' ) 
+            {
+  	        fputs( "\\section{", fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        foundcode = 1;
+            }
+            /////////////////////////
+            if ( notercode == 1 ) 
+            if ( foundcode == 0 )
+            {
+  	      foundcode = 1;
+            }
+
+            /// anti note
+            if ( notercode == 0 ) 
+            if ( foundcode == 0 ) // !note bla
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'n' ) 
+            if ( fetchline[2] == 'o' ) 
+            if ( fetchline[3] == 't' ) 
+            if ( fetchline[4] == 'e' ) 
+            if ( fetchline[5] == ' ' ) 
+            {
+  	      foundcode = 1;
+            }
+     // end of noter
+     // end of noter
+     // end of noter
+     // end of noter
 
 
 
@@ -3320,8 +3607,10 @@ void nfileunimark( char *fileout, char *filein )
             ////////////////
             if ( foundcode == 0 )
             if ( fetchcmdline[0] == '|' )
+            if ( fetchcmdline[1] == ' ' ) // <- this help to have nice code
             {
- 	      fputs( strtxt2tex(  strcut( fetchcmdline, 1-1+2, strlen(fetchcmdline))) , fp5 );
+ 	      //fputs( strtxt2tex(  strcut( fetchcmdline, 1-1+2, strlen(fetchcmdline))) , fp5 );
+ 	      fputs(  strcut( fetchcmdline, 1-1+2, strlen(fetchcmdline)) , fp5 );
               if ( option_strtxt2tex_linefeed == 1 )
               {
   	         fputs( "\\", fp5 );
@@ -3343,27 +3632,6 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
-	    /////////////////
-            if ( foundcode == 0 )
-            if ( fetchcmdline[0] == '!' )
-	    if ( strcmp( fetchcmdline, "!begin" ) == 0 )
-            {
-	      contentcode = 1;
- 	      fputs( "\\begin{document}" , fp5 );
-  	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
-
-            ////////////////
-            if ( foundcode == 0 )
-            if ( fetchcmdline[0] == '!' )
-	    if ( strcmp( fetchcmdline, "!enddoc" ) == 0 )
-            {
-	      contentcode = 0;
- 	      fputs( "\\end{document}" , fp5 );
-  	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
 
 
 
@@ -3512,141 +3780,6 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
-
-
-
-            // !input has even ~ now 
-            //( ( fetchline[0] == '!' )
-            if ( foundcode == 0 )
-	    if ( 
-            ( fetchline[0] ==  '!' ) 
-            && ( fetchline[1] == 'i' )
-            && ( fetchline[2] == 'n' )
-            && ( fetchline[3] == 'p' )
-            && ( fetchline[4] == 'u' )
-            && ( fetchline[5] == 't' )
-            && ( fetchline[6] == '{' )
-	    )
-            {
- 	      //fputs( strbraket( fetchline ) , fp5 );
- 	      //fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
-              fclose( fp5 );                 /// writer
-              long saved = ftell( fp6 );     /// reader
-              fclose( fp6 );                 /// reader
-
-              printf( ">COMMAND INPUT<\n"); 
-	      char fileinputsrc[PATH_MAX];
-	      strncpy( fileinputsrc,  myinputspath , PATH_MAX );
-              strncat( fileinputsrc , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-              printf( ">COMMAND INPUT Src %s<\n", fileinputsrc ); 
-
-	        if ( fileinputsrc[0] == '~' )
-	        {
-	         strncpy( fileinputsrc, "" , PATH_MAX );
-                 strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-                 strncat( fileinputsrc , strdelimit( fetchline,  '~' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-	        }
-                //filetexiex( fileout, strdelimit( fetchline,  '{' ,'}' ,  1 ) );
-		printf( "!input{%s} (fexist:%d) (...)\n", fileinputsrc , fexist( fileinputsrc ) );
-                printf( "> READ FROM IPATH: %s\n", myinputspath );
-                nfileunimark( fileout, fileinputsrc );
-              fp5 = fopen( fileout , "ab+"); /// writer
-              fp6 = fopen( filein , "r");  /// reader
-              fseek( fp6 , saved , SEEK_SET); // reader 
-  	      foundcode = 1;
-            }
-
-
-
-
-
-
-
-  // =====================================================
-  // =====================================================
-  //  INCLUDEs...
-  // =====================================================
-  // =====================================================
-
-            // !include{bla.mrk}  or #include{bla.mrk} (or depreciated $include{}
-            if ( foundcode == 0 )
-	    if ( 
-            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
-            && ( fetchline[1] == 'i' )
-            && ( fetchline[2] == 'n' )
-            && ( fetchline[3] == 'c' )
-            && ( fetchline[4] == 'l' )
-            && ( fetchline[5] == 'u' )
-            && ( fetchline[6] == 'd' )
-            && ( fetchline[7] == 'e' )
-            && ( fetchline[8] == '{' )
-	    )
-            {
-              fclose( fp5 );                 /// writer
-              long saved = ftell( fp6 );     /// reader
-              fclose( fp6 );                 /// reader
-
-	      char fileinputsrc[PATH_MAX];
-	      strncpy( fileinputsrc, "", PATH_MAX );
-              strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-              strncat( fileinputsrc , "/include/mrk/" , PATH_MAX - strlen( fileinputsrc ) -1 );
-              strncat( fileinputsrc , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
- 	      printf( " =>!include{%s} (fexist:%d) (...)\n", fileinputsrc , fexist( fileinputsrc ) );
-              nfileunimark( fileout, fileinputsrc );
-              fp5 = fopen( fileout , "ab+"); /// writer
-              fp6 = fopen( filein , "r");  /// reader
-              fseek( fp6 , saved , SEEK_SET); // reader 
-  	      foundcode = 1;
-            }
-
-
-            if ( foundcode == 0 )
-	    if ( 
-            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
-            && ( fetchline[1] == 'i' )
-            && ( fetchline[2] == 'n' )
-            && ( fetchline[3] == 'c' )
-            && ( fetchline[4] == 'l' )
-            && ( fetchline[5] == 'u' )
-            && ( fetchline[6] == 'd' )
-            && ( fetchline[7] == 'e' )
-            && ( fetchline[8] == ' ' )
-            && ( ( fetchline[9] == '<' ) || ( ( fetchline[9] == '"' ) ) )
-	    )
-            {
-              fclose( fp5 );                 /// writer
-              long saved = ftell( fp6 );     /// reader
-              fclose( fp6 );                 /// reader
-
-	      char fileinputsrc[PATH_MAX];
-
-	      strncpy( fileinputsrc, "", PATH_MAX );
-              if ( fetchline[9] == '<' )  
-              {
-                strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-                strncat( fileinputsrc , "/include/mrk/" , PATH_MAX - strlen( fileinputsrc ) -1 );
-                strncat( fileinputsrc , strdelimit( fetchline,  '<' ,'>' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-              }
-              else if ( fetchline[9] == '"' )  
-              {
-                strncat( fileinputsrc , strdelimit( fetchline,  '"' ,'"' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
-              }
-
- 	      printf( " =>!include{%s} (fexist:%d) (...)\n", fileinputsrc , fexist( fileinputsrc ) );
-              FILE *fpbis ;
-              fpbis = fopen( "pdflatex.log" , "ab+" );
-                fputs( "Input:", fpbis );
-                fputs( fileinputsrc, fpbis );
-                fputs( "\n" , fpbis );
-              fclose( fpbis );
-
-              nfileunimark( fileout, fileinputsrc );
-              fp5 = fopen( fileout , "ab+"); /// writer
-              fp6 = fopen( filein , "r");  /// reader
-              fseek( fp6 , saved , SEEK_SET); // reader 
-  	      foundcode = 1;
-            }
 
 
 
@@ -3975,13 +4108,10 @@ int cat_fdinfo( char *filein )
 
          if ( !feof(fp6) )
          {
-              //if      ( strcmp( fetchline , "!begin" ) == 0 )  beginend++;
               if ( strcmp( fetchline , "!enddoc" ) == 0 )
                    beginend++;
               else if ( strcmp( fetchline , "\\end{document}" ) == 0 ) 
                    beginend++;
-	      //printf( "%s", fetchline );
-	      //printf( "\n" );
 	 }
      }
      fclose( fp6 );
