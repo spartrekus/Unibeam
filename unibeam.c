@@ -1674,6 +1674,21 @@ void nfileunimark( char *fileout, char *filein )
 	      beamercode = 1;
   	      foundcode = 1;
             }
+            //// !nobeamer
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'n' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 'b' )
+            if ( fetchline[4] == 'e' )
+            if ( fetchline[5] == 'a' )
+            if ( fetchline[6] == 'm' )
+            if ( fetchline[7] == 'e' )
+            if ( fetchline[8] == 'r' )
+            {
+	      beamercode = 0;
+  	      foundcode = 1;
+            }
             //// !noter
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
@@ -1722,7 +1737,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
             ////////////////////
-            //// this is beamer
+            //// this is in !beamer
             ////////////////////
             // 20170930-175843 this is the advanced, with auto section numbering
             if ( foundcode == 0 )
@@ -1736,92 +1751,31 @@ void nfileunimark( char *fileout, char *filein )
               strncpy( slidemysection, strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , PATH_MAX );
   	      foundcode = 1;
             }
-              /*
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
-              strncat( slidebufferdata[foxy] , "\\section{"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
-              strncat( slidebufferdata[foxy] , "\\frametitle{"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , "\\thesection.~\\insertsection"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              */
 
 
-
-
-
-	    // raw functions
-            if ( foundcode == 0 )
-	    if ( beamercode == 1 )
-	    if ( contentcode == 1 )
-            if ( fetchline[0] == '\\' ) 
-            {
-              ///////////////
-              foxy++; 
-              strncpy( slidebufferdata[foxy] , strrlf( fetchline )  , PATH_MAX );
-              ///////////////
-  	      foundcode = 1;
-            }
-
-	    // raw functions
-            if ( foundcode == 0 )
-	    if ( beamercode == 1 )
-	    if ( contentcode == 1 )
-            if ( fetchline[0] == ':' ) 
-            if ( fetchline[1] == ' ' ) 
-            {
-              ///////////////
-              foxy++; 
-              //strncpy( slidebufferdata[foxy] , strrlf( fetchline )  , PATH_MAX );
-              char foofuncfound[PATH_MAX];
-              strncpy( foofuncfound, strcut( fetchline, 1+2, strlen(fetchline)) , PATH_MAX );
-              strncpy( slidebufferdata[foxy] , strrlf( foofuncfound )  , PATH_MAX );
-              ///////////////
-  	      foundcode = 1;
-            }
-
-
-
-
+            ////////////////////
+            //// this is in !beamer
+            ////////////////////
             // 20170930-175843 this is the default, without auto section numbering
             if ( foundcode == 0 )
-            if ( fetchline[0] == '=' )
-            if ( fetchline[1] == ' ' )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'h' )
+            if ( fetchline[2] == 'e' )
+            if ( fetchline[3] == 'a' )
+            if ( fetchline[4] == 'd' )
+            if ( fetchline[5] == 'e' )
+            if ( fetchline[6] == 'r' )
+            if ( fetchline[7] == ' ' )
 	    if ( beamercode == 1 ) 
             {
-//  	      fputs( "\\frametitle{" , fp5 );
-//  	      fputs( strtrim( strcut( fetchline, 1+2, strlen(fetchline))) , fp5 );
-//   	      fputs( "}\n", fp5 );
               foxy++;
               strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
               strncat( slidebufferdata[foxy] , "\\frametitle{"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , strtrim( strcut( fetchline, 1+2, strlen(fetchline))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+              strncat( slidebufferdata[foxy] , strtrim( strcut( fetchline, 7+2, strlen(fetchline))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
               strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
   	      foundcode = 1;
             }
 
-
-
-          /*
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '!' ) 
-            if ( fetchline[1] == 'n' )
-            if ( fetchline[2] == 'o' )
-            if ( fetchline[3] == 't' )
-            if ( fetchline[4] == 'e' )
-            if ( fetchline[5] == ' ' )
-            {
- 	      fputs( "\\note{" , fp5 );
- 	      fputs( strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , fp5 );
- 	      fputs( "}" , fp5 );
-  	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }  
-           */
 
             if ( foundcode == 0 )
 	    if ( beamercode == 1 ) 
@@ -2306,15 +2260,6 @@ void nfileunimark( char *fileout, char *filein )
                  strncpy( slidebufferdata[foxy] , "\\end{itemize}" , PATH_MAX );
                  ///////////////
 	      }
- 	      //fputs( "\\end{frame}\n" , fp5 );
- 	      //fputs( "\n" , fp5 );
- 	      //fputs( "\n" , fp5 );
-              //foxy++;//
-              //strncpy( slidebufferdata[foxy] , "\\end{frame}" , PATH_MAX );
-              //foxy++;//
-              //strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
-              //foxy++;//
-              //strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
 
               //////////////////////////////////////////////
               slidebufferfoundsection = 0;
@@ -4249,6 +4194,31 @@ int main( int argc, char *argv[])
 
 
 
+   ///////////////////////////////////////////
+   ///////////////////////////////////////////
+    if ( argc == 3)
+      if (( strcmp( argv[ 1 ] , "--create"  ) == 0  ) 
+      || ( strcmp( argv[ 1 ] , "--new"  ) == 0  ))
+      if ( ( strcmp( argv[ 2 ] , "beamer"  ) == 0  ) 
+      || ( strcmp( argv[ 2 ] , "slides"  ) == 0  ) )
+      {
+          printf( "Create example beamer\n");
+          fpout = fopen( "example.bmr" , "ab+");
+            fputs( "#include{beamer.mrk}\n", fpout );
+            fputs( "!gpath{figs}\n", fpout );
+            fputs( "!beamer\n", fpout );
+            fputs( "!begin\n", fpout );
+            fputs( "!section Section\n", fpout );
+            fputs( "!clr\n", fpout );
+            fputs( "> Header\n", fpout );
+            fputs( "- this is an example\n", fpout );
+            fputs( "// !fig{pic.png}\n", fpout );
+            fputs( "\n", fpout );
+          fclose( fpout );
+          return 0;
+      } 
+
+
 
 
    ///////////////////////////////////////////
@@ -4282,30 +4252,6 @@ int main( int argc, char *argv[])
           return 0;
       } 
 
-
-
-   ///////////////////////////////////////////
-   ///////////////////////////////////////////
-    if ( argc == 3)
-      if (( strcmp( argv[ 1 ] , "--create"  ) == 0  ) 
-      || ( strcmp( argv[ 1 ] , "--new"  ) == 0  ))
-      if ( strcmp( argv[ 2 ] , "beamer"  ) == 0  ) 
-      {
-          printf( "Create example beamer\n");
-          fpout = fopen( "example.bmr" , "ab+");
-            fputs( "#include{beamer.mrk}\n", fpout );
-            fputs( "!gpath{figs}\n", fpout );
-            fputs( "!beamer\n", fpout );
-            fputs( "!begin\n", fpout );
-            fputs( "!section Section\n", fpout );
-            fputs( "!clr\n", fpout );
-            fputs( "> Header\n", fpout );
-            fputs( "- this is an example\n", fpout );
-            fputs( "// !fig{pic.png}\n", fpout );
-            fputs( "\n", fpout );
-          fclose( fpout );
-          return 0;
-      } 
 
 
 
