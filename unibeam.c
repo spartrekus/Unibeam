@@ -1343,6 +1343,9 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( "\\usepackage{pdfpages}\n" , fp5 );
  	      fputs( "\\usepackage{wallpaper}\n" , fp5 );
  	      fputs( "\n" , fp5 );
+ 	      fputs( "\\usepackage{epstopdf}\n" , fp5 );
+ 	      fputs( "\\usepackage{enumitem}\n" , fp5 );  // for >>
+ 	      fputs( "\n" , fp5 );
                  //fputs( "\\usepackage{color,soul}\n", fp5 );
                  //fputs( "\\setlength\\parindent{0pt} \n", fp5 );
                  //fputs( "\\usepackage[parfill]{parskip}\n", fp5 );
@@ -4300,7 +4303,7 @@ int main( int argc, char *argv[])
           printf( "Create example beamer\n");
           fpout = fopen( "example.bmr" , "ab+");
             fputs( "#include{beamer.mrk}\n", fpout );
-            fputs( "!gpath{figs}\n", fpout );
+            fputs( "//!gpath{figs}\n", fpout );
             fputs( "!beamer\n", fpout );
             fputs( "!begin\n", fpout );
             fputs( "!section Section\n", fpout );
@@ -4334,7 +4337,7 @@ int main( int argc, char *argv[])
           fpout = fopen( "example.mrk" , "ab+");
             fputs( "!tex\n", fpout );
             fputs( "!gfx\n", fpout );
-            fputs( "!gpath{figs}\n", fpout );
+            fputs( "//!gpath{figs}\n", fpout );
             fputs( "!ipath{~/pool/mrkdir/}\n", fpout );
             fputs( "// \\usepackage[margin=0.5cm]{geometry}\n", fpout );
             fputs( "// \\pagestyle{headings}\n", fpout );
