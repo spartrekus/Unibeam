@@ -75,6 +75,7 @@ char slidebufferfignote[PATH_MAX];
 int  slidebufferfig=0;
 int  slidebuffernot=0;
 int  foxy = 0;
+int  mynumber = 1;
 
 
 int  slidebufferfoundsection = 0;
@@ -808,6 +809,8 @@ void nfileunimark( char *fileout, char *filein )
   char usertextfieldtwo[PATH_MAX];
   char wgetcmd[PATH_MAX];
   char extcmd[PATH_MAX];
+  int fooc; 
+  char fooccharo[PATH_MAX];
 
   int foundcode = 0; 
   int advancedcode = 1; 
@@ -1504,11 +1507,11 @@ void nfileunimark( char *fileout, char *filein )
   //  INCLUDEs...
   // =====================================================
   // =====================================================
-            // !input has even ~ now 
-            //( ( fetchline[0] == '!' )
+            // !input has even ~ now  , or #input{file.mrk}
             if ( foundcode == 0 )
 	    if ( 
-            ( fetchline[0] ==  '!' ) 
+            //( fetchline[0] ==  '!' ) 
+            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' ) )
             && ( fetchline[1] == 'i' )
             && ( fetchline[2] == 'n' )
             && ( fetchline[3] == 'p' )
@@ -1546,10 +1549,12 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+
             //////////////////
             if ( foundcode == 0 )
 	    if ( 
-            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
+            //( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
+            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' ) )
             && ( fetchline[1] == 'i' )
             && ( fetchline[2] == 'n' )
             && ( fetchline[3] == 'c' )
@@ -1578,6 +1583,7 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+       /*
             if ( foundcode == 0 )
 	    if ( 
             ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' )  || (  fetchline[0] ==  '$' ) )
@@ -1624,6 +1630,7 @@ void nfileunimark( char *fileout, char *filein )
               fseek( fp6 , saved , SEEK_SET); // reader 
   	      foundcode = 1;
             }
+          */
    ////////////////////////////////////////
    ////////////////////////////////////////
    //////// INCLUDE AND INPUT HERE (END)
@@ -1675,18 +1682,14 @@ void nfileunimark( char *fileout, char *filein )
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == ':' )
-            if ( fetchline[2] == 's' )
+            if ( fetchline[2] == 'b' )
             if ( fetchline[3] == 'e' )
-            if ( fetchline[4] == 't' )
-            if ( fetchline[5] == ' ' )
-            if ( fetchline[6] == 'b' )
-            if ( fetchline[7] == 'e' )
-            if ( fetchline[8] == 'a' )
-            if ( fetchline[9] == 'm' )
-            if ( fetchline[10] == 'e' )
-            if ( fetchline[11] == 'r' )
-            if ( fetchline[12] == '=' )
-            if ( fetchline[13] == '0' )
+            if ( fetchline[4] == 'a' )
+            if ( fetchline[5] == 'm' )
+            if ( fetchline[6] == 'e' )
+            if ( fetchline[7] == 'r' )
+            if ( fetchline[8] == '=' )
+            if ( fetchline[9] == '0' )
             {
 	      beamercode = 0;
   	      foundcode = 1;
@@ -1741,11 +1744,8 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[2] == 'l' )
             if ( fetchline[3] == 'r' )
             {
- 	      //fputs( "\\begin{frame}\n" , fp5 );
-              ///////////////
               foxy++;//
               strncpy( slidebufferdata[foxy] , "\\begin{frame}" , PATH_MAX );
-              ///////////////
 	      beamerlevel = 0;
   	      foundcode = 1;
             }
@@ -1756,6 +1756,7 @@ void nfileunimark( char *fileout, char *filein )
             //// this is in !beamer
             ////////////////////
             // 20170930-175843 this is the advanced, with auto section numbering
+            /*
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) // !sec sectionname for beamer
             if ( fetchline[1] == 's' )
@@ -1766,7 +1767,8 @@ void nfileunimark( char *fileout, char *filein )
             {
               strncpy( slidemysection, strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , PATH_MAX );
   	      foundcode = 1;
-            }
+            } 
+            */
 
 
             ////////////////////
@@ -1839,7 +1841,7 @@ void nfileunimark( char *fileout, char *filein )
 
 	     }
 	    }
-   */
+            */
 
 
 
@@ -3115,16 +3117,41 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            /////////////////////////////
-            /////////////////////////////
-            ///////////////////////////// for items
-            /////////////////////////////
+
+
             ///////////////////////////// for questions with points
             /////////////////////////////
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == '[' )
             if ( fetchline[2] == 'q' )
+            if ( fetchline[3] == 't' )  // for question topics
+            if ( fetchline[4] == ']' )
+            if ( fetchline[5] == ' ' )
+            {
+              fputs( "\\iexflechelf{{\\bfseries ", fp5 );
+ 	      fputs( strtrim( strcut( fetchline, 5+2, strlen(fetchline))) , fp5 );
+              fputs( "}}\\\\", fp5 );
+ 	      fputs( "\n" , fp5 );
+              //  fputs( "\\addtocounter{unibullcounter}{1}\n" , fp5 );
+  	      numberinglevel = 1;
+  	      foundcode = 1;
+            }
+            /*
+            \iexflechelf{{\bfseries Question Topic}}
+            \iexitembegin
+            \iexitem{Welche ...}
+            \iexitem{Was ist ...}
+            \iexitemend
+            */
+
+
+            ///////////////////////////// for questions with points
+            /////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == '[' )
+            if ( fetchline[2] == 'q' ) // used for english type of questions (single question list, with pts)
             if ( fetchline[3] == ']' )
             if ( fetchline[4] == ' ' )
             {
@@ -3159,9 +3186,35 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+            ///////////////////////////// ![nu] clause
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == '[' )
+            if ( fetchline[2] == 'n' ) 
+            if ( fetchline[3] == 'u' )
+            if ( fetchline[4] == ']' )
+            if ( fetchline[5] == ' ' )
+	    {
+	        if ( numberinglevel == 0) fputs( "\\begin{itemize}\n" , fp5 );
+ 	        fputs( "\\item[{\\bfseries " , fp5 );
+                fooc = snprintf( fooccharo, 50 , "%d", mynumber );
+ 	        fputs( fooccharo , fp5 );
+ 	        fputs( ".}]{" , fp5 );
+ 	        fputs( strcut( fetchline, 5+2, strlen(fetchline)) , fp5 );
+                fputs( "}" , fp5 );
+ 	        fputs( "\n" , fp5 );
+                mynumber++;
+		numberinglevel = 1;
+  	        foundcode = 1;
+            }
+
+
+
+
 
             ///////////////////////////// 
             /// free numbering question
+            /// for exr !! (example: ...)
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == '[' )
@@ -3198,6 +3251,9 @@ void nfileunimark( char *fileout, char *filein )
             /////////////////////////////
             /////////////////////////////
             /////////////////////////////
+            // old default
+            /////////////////////////////
+            /////////////////////////////
             /////////////////////////////
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
@@ -3232,6 +3288,7 @@ void nfileunimark( char *fileout, char *filein )
             /////////////////////////////
             /////////////////////////////
             /////////////////////////////
+            /*
             if ( foundcode == 0 )
 	    ///if ( contentcode == 1 )
             if ( fetchline[0] == '[' )
@@ -3262,6 +3319,8 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+            */
+
 
             //// closer
             if ( foundcode == 0 )
