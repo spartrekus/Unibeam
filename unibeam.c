@@ -52,6 +52,7 @@ char myinputspath[PATH_MAX];
 
 int markup_output_format = 1; // 1:tex, 2:html, 
 int markup_language = 1; // 1:english , 2:french, 3:german
+int markup_item = 1;    //  1:default , 2:3pkt, 
 
 int txtbeginreview = 0; 
 int txtrawcode = 0; 
@@ -768,6 +769,7 @@ void nfileunimark( char *fileout, char *filein )
   char mkdirdir[PATH_MAX];
   char ndirfig[PATH_MAX];
   char usertextfieldone[PATH_MAX];
+  char usertextfieleps[PATH_MAX];
   char usertextfieldtwo[PATH_MAX];
   char wgetcmd[PATH_MAX];
   char extcmd[PATH_MAX];
@@ -1103,7 +1105,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-	    /////////////////
+            /////////////////////////////////////
             /// for CSV or tables !!!!!!!!!!!!
             /////////////////////////////////////
             if ( foundcode == 0 )
@@ -1111,7 +1113,7 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[1] == '|' )
             if ( fetchline[2] == ' ' )
             {
- 	      fputs( strcsv2tex( strcut(   fetchline , 2+2, strlen(  fetchline )))  , fp5 );
+ 	      fputs( strcsv2tex(  strcut(   fetchline , 2+2, strlen(  fetchline )) )   , fp5 );
   	      fputs( " ", fp5 );
   	      fputs( "\\", fp5 );
   	      fputs( "\\", fp5 );
@@ -1119,6 +1121,23 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+
+            /////////////////////////////////////
+            /// for RAW or reviews !!!!!!!!!!!!
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '|' )
+            if ( fetchline[1] == '|' )
+            if ( fetchline[2] == '|' )
+            if ( fetchline[3] == ' ' )
+            {
+ 	      fputs( strcsv2tex(  strtxt2tex(   strcut(   fetchline , 3+2, strlen(  fetchline )) ) )  , fp5 );
+  	      //fputs( " ", fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
 
 
             /////////////////////////////////
@@ -1194,13 +1213,32 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+            if ( foundcode == 0 )   // !tikz 
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 't' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'k' )
+            if ( fetchline[4] == 'z' )
+            {
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\\usepackage{tikz}\n" , fp5 );
+ 	      fputs( "\n" , fp5 );
+  	      foundcode = 1;
+            }
+
 
             //////////////////////////////////
-            //// !packages
+            //// !package
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) // for left at 0 char pos
-            if ( fetchcmdline[0] == '!' )
-	    if ( strcmp( fetchcmdline, "!packages" ) == 0 )
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'a' )
+            if ( fetchline[3] == 'c' )
+            if ( fetchline[4] == 'k' )
+            if ( fetchline[5] == 'a' )
+            if ( fetchline[6] == 'g' )
+            if ( fetchline[7] == 'e' )
+	    //if ( strcmp( fetchline, "!packages" ) == 0 )
             {
  	      fputs( "\n" , fp5 );
  	      fputs( "\\usepackage{url}\n" , fp5 );
@@ -1217,6 +1255,7 @@ void nfileunimark( char *fileout, char *filein )
               fputs( "\\usepackage[none]{hyphenat}\n", fp5 );
   	      foundcode = 1;
             } 
+
 
 
 
@@ -2238,6 +2277,20 @@ void nfileunimark( char *fileout, char *filein )
                 markup_language = 3;
   	        foundcode = 1;
             }
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( strcmp( strrlf( fetchline ) , "!set item=1" ) == 0 )
+            {
+                markup_item = 1;
+  	        foundcode = 1;
+            }
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( strcmp( strrlf( fetchline ) , "!set item=2" ) == 0 )
+            {
+                markup_item = 2;
+  	        foundcode = 1;
+            }
 
 
 
@@ -2613,6 +2666,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
             /// old and ok
+            /// the most useful part
             if ( foundcode == 0 )
             if ( fetchline[0] == '-' )
             if ( fetchline[1] == ' ' )
@@ -2622,6 +2676,7 @@ void nfileunimark( char *fileout, char *filein )
  	        fputs( "\\begin{itemize}\n" , fp5 );
  	        fputs( "\\item " , fp5 );
  	        fputs( strtrim( strcut( fetchline, 1+2, strlen(fetchline))) , fp5 );
+                if ( markup_item == 2 ) fputs( " (3 Pkt.)" , fp5 );
  	        fputs( "\n" , fp5 );
 		itemlevel = 2;
 	      }
@@ -2629,6 +2684,7 @@ void nfileunimark( char *fileout, char *filein )
 	      {
  	        fputs( "\\item " , fp5 );
  	        fputs( strtrim( strcut( fetchline, 1+2, strlen(fetchline))) , fp5 );
+                if ( markup_item == 2 ) fputs( " (3 Pkt.)" , fp5 );
  	        fputs( "\n" , fp5 );
 	        itemlevel = 2;
 	      }
@@ -3492,6 +3548,53 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
+
+        //////////////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( ( ( fetchline[0] == '!' )
+            && ( fetchline[1] == 'x' )
+            && ( fetchline[2] == 'f' )
+            && ( fetchline[3] == 'i' )
+            && ( fetchline[4] == 'g' )
+            && ( fetchline[5] == '{' ))
+            )
+            {
+   	      printf( "EXTCMD: xfig\n" );
+ 	      strncpy( usertextfieldone, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+ 	      //strncpy( usertextfieldtwo, strdelimit( fetchline,  '{' ,'}' ,  2 ) , PATH_MAX );
+	      if ( strcmp( usertextfieldone, "" ) != 0 )
+	      if ( fexist( usertextfieldone ) == 1 )
+	      {
+                 strncpy( usertextfieleps , fbasenoext( usertextfieldone ) , PATH_MAX );
+                 strncat( usertextfieleps , ".eps" , PATH_MAX - strlen( usertextfieleps ) -1 );
+   	         printf( " xfig found directory: %s \n", usertextfieldone );
+                 strncpy( extcmd, "",  PATH_MAX );
+                 strncat( extcmd , " fig2dev -L eps " , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "  \""  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  usertextfieldone  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "\""  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "  \""  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  usertextfieleps  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "\""  , PATH_MAX - strlen( extcmd ) -1 );
+   	         printf( " xfig: %s\n" , extcmd );
+                 {
+   	           printf( "CMD:%s\n", extcmd );
+   	           system( extcmd ); 
+                 }
+                 if ( fexist( usertextfieleps ) == 1 )
+                 {
+         	        fputs( "\\begin{center}\n", fp5 );
+         	        fputs( "\\includegraphics[width=1.0\\textwidth]{" , fp5 );
+        	        fputs( usertextfieleps , fp5 );
+         	        fputs( "}\n", fp5 );
+         	        fputs( "\\end{center}\n", fp5 );
+                 }
+	      }
+  	      foundcode = 1;
+            }
 
 
 
