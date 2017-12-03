@@ -12,7 +12,7 @@
 //////////////////////////////////
 
 
-/// include
+/// Note: include, tiny isn't it?
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -23,9 +23,6 @@
 #include <sys/types.h>
 #include <unistd.h> 
 #include <time.h>
-
-
-
 
 
 
@@ -61,6 +58,85 @@ int notercode  = 0;
 int contentcode = 0; 
 int option_system_call = 0;           // this will be 0 by default (depreciated)
 int option_strtxt2tex_linefeed = 1;   // this shall be 0 by default for compact documents
+
+
+
+
+
+
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+int fexist(char *a_option)
+{
+  char dir1[PATH_MAX]; 
+  char *dir2;
+  DIR *dip;
+  strncpy( dir1 , "",  PATH_MAX  );
+  strncpy( dir1 , a_option,  PATH_MAX  );
+
+  struct stat st_buf; 
+  int status; 
+  int fileordir = 0 ; 
+
+  status = stat ( dir1 , &st_buf);
+  if (status != 0) {
+    fileordir = 0;
+  }
+
+  // this is compatible to check if a file exists
+  FILE *fp2check = fopen( dir1  ,"r");
+  if( fp2check ) {
+  // exists
+  fileordir = 1; 
+  fclose(fp2check);
+  } 
+
+  if (S_ISDIR (st_buf.st_mode)) {
+    fileordir = 2; 
+  }
+return fileordir;
+/////////////////////////////
+}
+
+
+
+
+
+
+
+//////////////////
+void ncp( char *filetarget,  char *  filesource )
+{
+  // fread
+  char            buffer[1];
+  size_t          n;
+  size_t          m;
+  FILE *fp;
+  FILE *fp1; 
+  FILE *fp2;
+  int counter = 0 ; 
+  int freader = 1 ; 
+  int i , j ,posy, posx ; 
+  if ( fexist( filesource ) == 1 )
+  {
+        fp = fopen( filesource, "rb");
+        fp2 = fopen( filetarget, "wb");
+        counter = 0; 
+        while(  !feof(fp) && ( freader == 1)   ) {
+           if (  feof(fp)   ) {
+                freader = 0 ; 
+            }
+            n = fread(  buffer, sizeof(char), 1 , fp);
+            m = fwrite( buffer, sizeof(char), 1,  fp2);
+        }
+        fclose(fp2);
+        fclose(fp);
+      }
+}
+
+
+
 
 
 
@@ -238,44 +314,6 @@ char *strcsv2tex(char *str)
 
 
 
-
-
-
-
-/////////////////////////////////
-/////////////////////////////////
-/////////////////////////////////
-int fexist(char *a_option)
-{
-  char dir1[PATH_MAX]; 
-  char *dir2;
-  DIR *dip;
-  strncpy( dir1 , "",  PATH_MAX  );
-  strncpy( dir1 , a_option,  PATH_MAX  );
-
-  struct stat st_buf; 
-  int status; 
-  int fileordir = 0 ; 
-
-  status = stat ( dir1 , &st_buf);
-  if (status != 0) {
-    fileordir = 0;
-  }
-
-  // this is compatible to check if a file exists
-  FILE *fp2check = fopen( dir1  ,"r");
-  if( fp2check ) {
-  // exists
-  fileordir = 1; 
-  fclose(fp2check);
-  } 
-
-  if (S_ISDIR (st_buf.st_mode)) {
-    fileordir = 2; 
-  }
-return fileordir;
-/////////////////////////////
-}
 
 
 
@@ -3553,7 +3591,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
         //////////////////////////////////////////////
-            if ( foundcode == 0 )
+            if ( foundcode == 0 ) // xfig
             if ( ( ( fetchline[0] == '!' )
             && ( fetchline[1] == 'x' )
             && ( fetchline[2] == 'f' )
@@ -3570,7 +3608,7 @@ void nfileunimark( char *fileout, char *filein )
 	      {
                  strncpy( usertextfieleps , fbasenoext( usertextfieldone ) , PATH_MAX );
                  strncat( usertextfieleps , ".eps" , PATH_MAX - strlen( usertextfieleps ) -1 );
-   	         printf( " xfig found directory: %s \n", usertextfieldone );
+   	         printf( " xfig found file: %s \n", usertextfieldone );
                  strncpy( extcmd, "",  PATH_MAX );
                  strncat( extcmd , " fig2dev -L eps " , PATH_MAX - strlen( extcmd ) -1 );
                  strncat( extcmd ,  "  \""  , PATH_MAX - strlen( extcmd ) -1 );
@@ -3595,6 +3633,91 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+
+
+
+
+
+
+
+        //////////////////////////////////////////////
+        // pstoedit  -f fig file.eps  > file.fig
+            if ( foundcode == 0 )  // eps2xfig from directory ~/pool/figs/ to local directory
+            if ( ( ( fetchline[0] == '!' )
+            && ( fetchline[1] == 'e' )
+            && ( fetchline[2] == 'p' )
+            && ( fetchline[3] == 's' )
+            && ( fetchline[4] == '2' )
+            && ( fetchline[5] == 'f' )
+            && ( fetchline[6] == 'i' )
+            && ( fetchline[7] == 'g' )
+            && ( fetchline[8] == '{' ))
+            )
+            {
+   	      printf( "EXTCMD: eps2fig script from pool to local dir \n" );
+ 	      strncpy( usertextfieldone, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+	      if ( strcmp( usertextfieldone, "" ) != 0 )
+	      //if ( fexist( usertextfieldone ) == 1 )  // to be updated
+	      {
+                 strncpy( usertextfieleps , fbasenoext( usertextfieldone ) , PATH_MAX );
+                 strncat( usertextfieleps , ".fig" , PATH_MAX - strlen( usertextfieleps ) -1 );  // target
+   	         printf( " pstoedit found file: %s \n", usertextfieldone );
+                 strncpy( extcmd, "",  PATH_MAX );
+                 strncat( extcmd , " pstoedit -f fig  " , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "  ~/pool/figs/\""  , PATH_MAX - strlen( extcmd ) -1 );  // to be updated
+                 strncat( extcmd ,  usertextfieldone  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "\""  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "  \""  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  usertextfieleps  , PATH_MAX - strlen( extcmd ) -1 );
+                 strncat( extcmd ,  "\""  , PATH_MAX - strlen( extcmd ) -1 );
+   	         printf( "CMD:%s\n", extcmd );
+   	         system( extcmd ); 
+	      }
+  	      foundcode = 1;
+            }
+
+
+
+        //////////////////////////////////////////////
+        // fetch from ~/pool/figs  // !fetch 
+        //////////////////////////////////////////////
+            if ( foundcode == 0 )  
+            if ( ( ( fetchline[0] == '!' )
+            && ( fetchline[1] == 'f' )
+            && ( fetchline[2] == 'e' )
+            && ( fetchline[3] == 't' )
+            && ( fetchline[4] == 'c' )
+            && ( fetchline[5] == 'h' )
+            && ( fetchline[6] == '{' ))
+            )
+            {
+   	      printf( "Int cmd: fetch with ncp script for image from pool to local dir \n" );
+ 	      strncpy( usertextfieldone, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+   	      printf( "  => file: %s\n", usertextfieldone ); 
+	      if ( strcmp( usertextfieldone, "" ) != 0 )
+	      {
+                  strncpy( usertextfieleps , fbasename( usertextfieldone ) , PATH_MAX );
+                  //strncpy( usertextfieleps , fbasenoext( usertextfieldone ) , PATH_MAX );
+                  //strncat( usertextfieleps , ".fig" , PATH_MAX - strlen( usertextfieleps ) -1 );  // target
+    	          char filencp[PATH_MAX];
+    	          strncpy( filencp, "", PATH_MAX );
+                  strncat( filencp , getenv( "HOME" ) , PATH_MAX - strlen( filencp ) -1 );
+                  strncat( filencp , "/pool/figs/" , PATH_MAX - strlen( filencp ) -1 );
+                  strncat( filencp ,  usertextfieldone  , PATH_MAX - strlen( filencp ) -1 );
+                  printf( " [ncp] dest:%s <= src:%s \n", usertextfieleps, filencp );  
+                  if ( fexist( filencp ) == 1 )
+                  if ( fexist( usertextfieleps ) != 2 )
+                  {
+                    ncp( usertextfieleps, filencp ); 
+                  }
+                  else 
+                  {
+                    printf( " file not found: %s \n", filencp ); 
+                  }
+	      }
+  	      foundcode = 1;
+            }
+
 
 
 
