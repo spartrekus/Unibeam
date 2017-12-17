@@ -1147,11 +1147,13 @@ void nfileunimark( char *fileout, char *filein )
             /// for CSV or tables !!!!!!!!!!!!
             /////////////////////////////////////
             if ( foundcode == 0 )
-            if ( fetchline[0] == '|' )
-            if ( fetchline[1] == '|' )
-            if ( fetchline[2] == ' ' )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'c' )
+            if ( fetchline[2] == 's' )
+            if ( fetchline[3] == 'v' )
+            if ( fetchline[4] == ' ' )
             {
- 	      fputs( strcsv2tex(  strcut(   fetchline , 2+2, strlen(  fetchline )) )   , fp5 );
+ 	      fputs( strcsv2tex(  strcut(   fetchline , 4+2, strlen(  fetchline )) )   , fp5 );
   	      fputs( " ", fp5 );
   	      fputs( "\\", fp5 );
   	      fputs( "\\", fp5 );
@@ -1160,17 +1162,33 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+
+
+
+
+
+
+            /////////////////////////////////////
+            /// for RAW or reviews !!!!!!!!!!!!
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '|' )
+            if ( fetchline[1] == ' ' )
+            {
+ 	      fputs(  strtxt2tex(   strcut(   fetchline , 1+2, strlen(  fetchline )) )   , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
             /////////////////////////////////////
             /// for RAW or reviews !!!!!!!!!!!!
             /////////////////////////////////////
             if ( foundcode == 0 )
             if ( fetchline[0] == '|' )
             if ( fetchline[1] == '|' )
-            if ( fetchline[2] == '|' )
-            if ( fetchline[3] == ' ' )
+            if ( fetchline[2] == ' ' )
             {
- 	      fputs( strcsv2tex(  strtxt2tex(   strcut(   fetchline , 3+2, strlen(  fetchline )) ) )  , fp5 );
-  	      //fputs( " ", fp5 );
+ 	      fputs(  strtxt2tex(   strcut(   fetchline , 2+2, strlen(  fetchline )) )   , fp5 );
   	      fputs( "\\", fp5 );
   	      fputs( "\\", fp5 );
   	      fputs( "\n", fp5 );
@@ -1548,6 +1566,7 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+
             ////////////////////
             // 20170930-175843 this is the default, without auto section numbering
             if ( foundcode == 0 )
@@ -1568,6 +1587,26 @@ void nfileunimark( char *fileout, char *filein )
               strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
   	      foundcode = 1;
             }
+
+            ////////////////////
+            // this is the short !header default
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'h' )
+            if ( fetchline[2] == 'd' )
+            if ( fetchline[3] == ' ' )
+	    if ( beamercode == 1 ) 
+            {
+              foxy++;
+              strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
+              strncat( slidebufferdata[foxy] , "\\frametitle{"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+              strncat( slidebufferdata[foxy] , strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+              strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+  	      foundcode = 1;
+            }
+
+
+
 
 
             if ( foundcode == 0 )
@@ -1915,7 +1954,29 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            // !bigskip
+            // !linefeed (beamer)
+            if ( foundcode == 0 )
+	    if ( beamercode == 1 )
+	    if ( contentcode == 1 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'l' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'n' )
+            if ( fetchline[4] == 'e' )
+            if ( fetchline[5] == 'f' )
+            if ( fetchline[6] == 'e' )
+            if ( fetchline[7] == 'e' )
+            if ( fetchline[8] == 'd' )
+            {
+              ///////////////
+              foxy++;//
+              strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
+              strncat( slidebufferdata[foxy] , "\\bigskip"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+              ///////////////
+  	      foundcode = 1;
+            }
+
+            // !bigskip (beamer)
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
@@ -3156,6 +3217,26 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+	    /////////////////
+	    /////////////////
+	    /////////////////
+            if ( foundcode == 0 ) // !linefeed (small space) (better than medskip)
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'l' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'n' )
+            if ( fetchline[4] == 'e' )
+            if ( fetchline[5] == 'f' )
+            if ( fetchline[6] == 'e' )
+            if ( fetchline[7] == 'e' )
+            if ( fetchline[8] == 'd' )
+            {
+ 	      fputs( "\\vskip " , fp5 );
+  	      fputs( "0.05in", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
 
 
 
@@ -3640,6 +3721,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+  /*
         //////////////////////////////////////////////
         // pstoedit  -f fig file.eps  > file.fig
             if ( foundcode == 0 )  // eps2xfig from directory ~/pool/figs/ to local directory
@@ -3675,6 +3757,7 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+    */
 
 
 
@@ -3721,11 +3804,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
-
-
-
-
+            // !fin !fin 
 	    if ( foundcode == 0 )
 	    {
 	        if ( beginitemize == 1 )
@@ -3958,6 +4037,33 @@ int main( int argc, char *argv[])
           }
           return 0;
     }
+
+
+   ///////////////////////////////////////////
+   ///////////////////////////////////////////
+    if ( argc == 4)
+      if ( strcmp( argv[ 1 ] , "--new"  ) == 0  )
+      if ( strcmp( argv[ 2 ] , "beamer"  ) == 0  ) 
+      if ( strcmp( argv[ 3 ] , ""  ) != 0  ) 
+      {
+          printf( "Create example beamer\n");
+          fpout = fopen( argv[3] , "ab+");
+            fputs( "#include{beamer.mrk}\n", fpout );
+            fputs( "!gpath{figs}\n", fpout );
+            fputs( "!beamer\n", fpout );
+            fputs( "!begin\n", fpout );
+            fputs( "!clr\n", fpout );
+            fputs( "!= Section\n", fpout );
+            fputs( "> Header\n", fpout );
+            fputs( "- this is an example\n", fpout );
+            fputs( "// !fig{pic.png}\n", fpout );
+            fputs( "\n", fpout );
+          fclose( fpout );
+          return 0;
+      } 
+
+
+
 
 
 
