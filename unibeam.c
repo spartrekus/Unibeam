@@ -11,7 +11,25 @@
 //////////////////////////////////
 
 /// Note: include, tiny isn't it?
+//#include <stdio.h>
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
 #include <stdio.h>
+#if defined(__linux__)
+#define MYOS 1
+#elif defined(_WIN32)
+#define MYOS 2
+#elif defined(_WIN64)
+#define MYOS 3
+#elif defined(__unix__)
+#define MYOS 4
+#define PATH_MAX 2500
+#else
+#define MYOS 0
+#endif
+
+
 #include <string.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -1675,6 +1693,19 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             } 
 
+            //// !html
+            // 20180101-105417
+            if ( foundcode == 0 )  //!html for simplicity
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'h' )
+            if ( fetchline[2] == 't' )
+            if ( fetchline[3] == 'm' )
+            if ( fetchline[4] == 'l' )
+            {
+              markup_output_format = 2;
+  	      foundcode = 1;
+            } 
+
 
 
 
@@ -2249,6 +2280,76 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+     // begin of html
+     // begin of html
+         ///////////////////////////////////////
+         ///////////////////////////////////////
+         ///////////////////////////////////////
+         ///////////////////////////////////////
+         /// SOME HTML !! ul li 
+         ///////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( markup_output_format == 2 )
+            if ( fetchline[0] == '-' )
+            if ( fetchline[1] == ' ' )
+            {
+	     if ( itemlevel == 1)  
+             {
+ 	        fputs( "<li>" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 1+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "</li>\n", fp5 );
+             }
+             foundcode = 1;
+           }
+          ///////////////////////////////////////
+           if ( foundcode == 0 )
+           if ( markup_output_format == 2 )
+           if ( fetchline[0] == '>' )
+           if ( fetchline[1] == ' ' )
+           {
+	     if ( itemlevel == 0)  
+             {
+ 	        fputs( "<ul>" , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 1+2, strlen( fetchline ))) , fp5 );
+  	        fputs( "\n", fp5 );
+                itemlevel = 1 ;
+             }
+             foundcode = 1;
+          }
+          ///////////////////////////////////////
+	  // item closer 
+            if ( foundcode == 0 )
+            if ( markup_output_format == 2 )
+	    if ( itemlevel >= 1 )
+            if ( fetchline[0] != '\\' )
+            if ( fetchline[0] != '!' )
+            {
+	      for ( fooi = 1 ; fooi <= itemlevel ; fooi++)
+	      {
+ 	         fputs( "</ul>\n" , fp5 );
+	      }
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\n" , fp5 );
+	      itemlevel = 0;
+  	      foundcode = 1;
+           }
+         ///////////////////////////////////////
+     // end of html
+     // end of html
+
+
+
+
+
+
+
+
+
+
+
+
             /////////////////////////////////////////////////////////////////
             if ( notercode == 1 ) 
             if ( foundcode == 0 )
@@ -2665,31 +2766,6 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            /////////////////////////////
-            /////////////////////////////
-            ///////////////////////////// for items
-            /////////////////////////////
-    /*
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '!' )
-            if ( fetchline[1] == '[' )
-            if ( fetchline[2] == '-' )
-            if ( fetchline[3] == ']' )
-            if ( fetchline[4] == ' ' )
-            {
- 	        fputs( "\\begin{itemize}\n", fp5 );
- 	        fputs( "\\item " , fp5 );
- 	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
- 	        fputs( "\n" , fp5 );
- 	        fputs( "\\end{itemize}\n", fp5 );
-  	        foundcode = 1;
-            }
-         */
-
-
-
-
-
 
             /////////////////////////////
             /////////////////////////////
@@ -2718,6 +2794,18 @@ void nfileunimark( char *fileout, char *filein )
 	      }
  	      foundcode = 1;
             }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2962,6 +3050,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
          ///////////////////////////////////////
          ///////////////////////////////////////
          ///////////////////////////////////////
@@ -3009,7 +3098,7 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
-	    // closer  (old item, but very stable)
+	    // the most important: the item closer  (old item, but very stable)
             if ( foundcode == 0 )
 	    if ( itemlevel >= 1 )
             if ( fetchline[0] != '\\' )
@@ -4106,7 +4195,12 @@ void nfileunimark( char *fileout, char *filein )
 		  fputs( "\\iexitemend\n" , fp5 ); 
 		  fputs( "\n" , fp5 ); 
 		}
+
  	        fputs( fetchline , fp5 );
+
+                if ( markup_output_format == 2 )
+ 	            fputs( "<br>" , fp5 );
+
   	        fputs( "\n", fp5 );
 	        beginitemize = 0;
             }
