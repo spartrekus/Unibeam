@@ -41,12 +41,15 @@
 #include <time.h>
 
 
+// note !fig are regular figures for books, reports, and manuscripts (this is prefered).
+// note !img are images (similar) for classical easy to use work (quick, simple).
 
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 /// global vars which can be removed for better readability 
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
+char doc_version[PATH_MAX];
 char slidebufferdata[200][PATH_MAX];
 char slidebufferfigfile[PATH_MAX];
 char slidebufferfigfile1[PATH_MAX];
@@ -63,7 +66,7 @@ char slidemysection[PATH_MAX];
 char mygraphicspath[PATH_MAX];
 char myinputspath[PATH_MAX];
 
-int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc
+int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+  
 int markup_language = 1; // 1:english , 2:french, 3:german
 int markup_item = 1;    //  1:default , 2:3pkt, 
 
@@ -254,8 +257,6 @@ char *strtxt2tex(char *str)
           ptr[j++]='%';
 	}
 
-        //    \newcommand{\lt}{\ensuremath{<}\thinspace}%
-        //    \newcommand{\gt}{\ensuremath{>}\thinspace}%
         else if ( str[i] == '>' ) 
 	{
           ptr[j++]='\\';
@@ -1050,7 +1051,7 @@ void nfileunimark( char *fileout, char *filein )
 	    }
 
 
-
+         
           /////// txtrawcode, activated with !beginraw
           if ( txtrawcode == 1 )
           {
@@ -1165,6 +1166,69 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+
+
+
+
+
+
+
+
+     //// EXAM+ 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '>' )
+            if ( fetchline[1] == '>' )
+            if ( fetchline[2] == ' ' )
+            if ( markup_output_format == 6 ) //!exam+
+            {
+	      if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 1;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 0)  
+	      {
+ 	        fputs( "\\begin{enumerate}[resume]\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 1;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
+            }
+
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'q' )
+            if ( fetchline[2] == 'u' )
+            if ( fetchline[3] == ' ' )
+            if ( markup_output_format == 6 ) //!exam+
+            {
+	      if ( numberinglevel == 2)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+ 	        fputs( " (3 Pkt.)" , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\begin{enumerate}\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+ 	        fputs( " (3 Pkt.)" , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
+            }
 
 
 
@@ -1339,6 +1403,24 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "}\n", fp5 );
   	      foundcode = 1;
             }
+
+
+            // !version text 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'v' )
+            if ( fetchline[2] == 'e' )
+            if ( fetchline[3] == 'r' )
+            if ( fetchline[4] == 's' )
+            if ( fetchline[5] == 'i' )
+            if ( fetchline[6] == 'o' )
+            if ( fetchline[7] == 'n' )
+            if ( fetchline[8] == ' ' )
+            {
+              strncpy( doc_version, strcut( fetchline, 8+2, strlen(fetchline)) ,  PATH_MAX );
+  	      foundcode = 1;
+            }
+
 
 
             // !title text 
@@ -1606,7 +1688,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
             //////////////////////////////////
-            //// !package
+            //// !package !packages 
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) // for left at 0 char pos
             if ( fetchline[1] == 'p' )
@@ -1616,6 +1698,7 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[5] == 'a' )
             if ( fetchline[6] == 'g' )
             if ( fetchline[7] == 'e' )
+            ////
             {
  	      fputs( "\n" , fp5 );
  	      fputs( "\\usepackage{url}\n" , fp5 );
@@ -1623,6 +1706,7 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( "\\usepackage{graphicx}\n" , fp5 );
  	      fputs( "\\usepackage{grffile}\n" , fp5 );
  	      fputs( "\\usepackage{pdfpages}\n" , fp5 );
+ 	      //fputs( "\\usepackage{gensymb}\n" , fp5 ); //symbols
  	      fputs( "\\usepackage{wallpaper}\n" , fp5 );
  	      fputs( "\n" , fp5 );
  	      fputs( "\\usepackage{epstopdf}\n" , fp5 );
@@ -1699,6 +1783,27 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[1] == 'r' )
             if ( fetchline[2] == 'a' )
             if ( fetchline[3] == 'w' )
+            {
+	      txtrawcode = 1;
+  	      foundcode = 1;
+            }
+
+
+
+            // !content raw, useful for reviewers (like !beginraw)
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'c' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 'n' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == 'e' )
+            if ( fetchline[6] == 'n' )
+            if ( fetchline[7] == 't' )
+            if ( fetchline[8] == ' ' )
+            if ( fetchline[9] == 'r' )
+            if ( fetchline[10] == 'a' )
+            if ( fetchline[11] == 'w' )
             {
 	      txtrawcode = 1;
   	      foundcode = 1;
@@ -1913,7 +2018,20 @@ void nfileunimark( char *fileout, char *filein )
             } 
 
 
-            //// !exam
+            //// !exam+  //
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'e' )
+            if ( fetchline[2] == 'x' )
+            if ( fetchline[3] == 'a' )
+            if ( fetchline[4] == 'm' )
+            if ( fetchline[5] == '+' )
+            {
+              markup_output_format = 6;
+  	      foundcode = 1;
+            } 
+
+            //// !exam  for en exams !!
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == 'e' )
@@ -1924,6 +2042,7 @@ void nfileunimark( char *fileout, char *filein )
               markup_output_format = 3;
   	      foundcode = 1;
             } 
+
 
 
 
@@ -3310,7 +3429,6 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[11] == '{' )
             {
   	      fputs( "\\CenterWallPaper{1}{", fp5 );
- 	      //fputs( strtrim( strcut( fetchline, 11+2, strlen(fetchline))) , fp5 );
  	      fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
   	      fputs( "}\n", fp5 );
   	      foundcode = 1;
@@ -3319,6 +3437,30 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+            ///////////// !img[0.5]{ } 
+            ///////////// !img[0.5]{image.png}  with 0.5 is the reduction level (width)
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'i' )
+            if ( fetchline[2] == 'm' )
+            if ( fetchline[3] == 'g' )
+            if ( fetchline[4] == '[' )
+            {
+  	        //fputs( "\\begin{center}\n", fp5 );
+  	        fputs( "\\includegraphics[scale,height=" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '[' ,']' ,  1 ) , fp5 );
+                fputs( "\\textheight]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        //fputs( "\\end{center}\n", fp5 );
+  	        //fputs( "\\includegraphics[scale=" , fp5 );
+  	        //fputs( "]{" , fp5 );
+ 	        //fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        //fputs( "}\n", fp5 );
+  	        foundcode = 1;
+            }
 
 
             ///////////// !img 
@@ -3852,6 +3994,13 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
+
+
+
+
             ///////////////////////////// 
             /// sometimes useful, with !qu 
             /// Simple, and relatively easy
@@ -3941,9 +4090,11 @@ void nfileunimark( char *fileout, char *filein )
             {
 	      for ( fooi = 1 ; fooi <= numberinglevel ; fooi++)
 	      {
-	         fputs( "\\end{itemize}\n" , fp5 );
+                 if ( markup_output_format == 6 ) 
+	           fputs( "\\end{enumerate}\n" , fp5 );
+                 else
+	           fputs( "\\end{itemize}\n" , fp5 );
 	      }
-              //fputs( "\\setcounter{unibullcounter}{1}\n" , fp5 );
  	      fputs( "\n" , fp5 );
  	      fputs( "\n" , fp5 );
 	      numberinglevel = 0;
@@ -5436,6 +5587,7 @@ int main( int argc, char *argv[])
             fputs( "!gfx\n", fpout );
             fputs( "//!gpath{figs}\n", fpout );
             fputs( "!ipath{~/pool/mrkdir/}\n", fpout );
+            fputs( "//\\usepackage{gensymb}\n", fpout );  // for the degree 
             fputs( "//\\usepackage[margin=0.5cm]{geometry}\n", fpout );
             fputs( "//\\pagestyle{headings}\n", fpout );
             fputs( "!begin\n", fpout );
