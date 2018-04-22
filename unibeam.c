@@ -66,7 +66,7 @@ char slidemysection[PATH_MAX];
 char mygraphicspath[PATH_MAX];
 char myinputspath[PATH_MAX];
 
-int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+  
+int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+  7: math enumitem 
 int markup_language = 1; // 1:english , 2:french, 3:german
 int markup_item = 1;    //  1:default , 2:3pkt, 
 
@@ -1163,6 +1163,88 @@ void nfileunimark( char *fileout, char *filein )
             if ( commenton == 1 )
             {
     	      foundcode = 1;
+            }
+
+
+
+
+
+
+
+
+
+
+
+            //// Math list 
+            //// !mathlist  // with >> and !qu 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'm' )
+            if ( fetchline[2] == 'a' )
+            if ( fetchline[3] == 't' )
+            if ( fetchline[4] == 'h' )
+            if ( fetchline[5] == 'l' )
+            if ( fetchline[6] == 'i' )
+            if ( fetchline[7] == 's' )
+            if ( fetchline[8] == 't' )
+            {
+              markup_output_format = 7;
+  	      foundcode = 1;
+            } 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '>' )
+            if ( fetchline[1] == '>' )
+            if ( fetchline[2] == ' ' )
+            if ( markup_output_format == 7 ) //!mathlist
+            {
+	      if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 1;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 0)  
+	      {
+ 	        //fputs( "\\begin{enumerate}[resume]\n" , fp5 );
+ 	        fputs( "\\begin{enumerate}\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 2+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 1;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
+            }
+
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'q' )
+            if ( fetchline[2] == 'u' )
+            if ( fetchline[3] == ' ' )
+            if ( markup_output_format == 7 ) //!exam+
+            {
+	      if ( numberinglevel == 2)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+ 	        //fputs( "" , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\begin{enumerate}\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+ 	        //fputs( " (3 Pkt.)" , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
             }
 
 
