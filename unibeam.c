@@ -251,6 +251,12 @@ char *strtxt2tex(char *str)
           ptr[j++]='{';
 	}
 
+        else if ( str[i] == '^' ) 
+	{
+          ptr[j++]='\\';
+          ptr[j++]='^';
+	}
+
         else if ( str[i] == '%' ) 
 	{
           ptr[j++]='\\';
@@ -340,6 +346,41 @@ char *strtxt2tex(char *str)
       return r ? memcpy(r, ptr, siz ) : NULL;
 }
 
+
+
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+char *strtext2tex(char *str)
+{  
+      char ptr[ 5* strlen(str)+1];
+      int i,j=0;
+      for(i=0; str[i]!='\0'; i++)
+      {
+        if ( str[i] == '&' ) 
+	{
+          ptr[j++]='\\';
+          ptr[j++]='&';
+	}
+        else if ( str[i] == '_' ) 
+	{
+          ptr[j++]=' ';
+	}
+        else if ( str[i] == '%' ) 
+	{
+          ptr[j++]='\\';
+          ptr[j++]='%';
+	}
+        else
+	{
+          ptr[j++]=str[i];
+	}
+      } 
+      ptr[j]='\0';
+      size_t siz = 1 + sizeof ptr ; 
+      char *r = malloc( 1 +  sizeof ptr );
+      return r ? memcpy(r, ptr, siz ) : NULL;
+}
 
 
 
@@ -1052,7 +1093,8 @@ void nfileunimark( char *fileout, char *filein )
 
 
          
-          /////// txtrawcode, activated with !beginraw
+         /////// txtrawcode, activated with !beginraw
+         // you may let this section
           if ( txtrawcode == 1 )
           {
              if ( fetchline[0] != '!' ) 
@@ -1523,23 +1565,6 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "}\n", fp5 );
   	      foundcode = 1;
             }
-            // !|title text 
-            if ( foundcode == 0 )
-          if ( ( fetchline[0] == '!' )
-            && ( fetchline[1] == '|' )
-            && ( fetchline[2] == 't' )
-            && ( fetchline[3] == 'i' )
-            && ( fetchline[4] == 't' )
-            && ( fetchline[5] == 'l' )
-            && ( fetchline[6] == 'e' )
-            && ( fetchline[7] == ' ' ))
-            {
- 	      fputs( "\\title{" , fp5 );
- 	      fputs(  strtxt2tex( strcut( fetchline, 7+2, strlen(fetchline)) ) , fp5 );
-  	      fputs( "}\n", fp5 );
-  	      foundcode = 1;
-            }
-
 
 
 
@@ -1562,9 +1587,27 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+            /////////////////////////////////////
+            /// for !line 
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'l' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'n' )
+            if ( fetchline[4] == 'e' )
+            if ( fetchline[5] == ' ' )
+            {
+ 	      fputs( strcut( fetchline , 5+2, strlen(  fetchline ))    , fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
 
             /////////////////////////////////////
-            /// for CSV or tables !!!!!!!!!!!!
+            /// for CSV or tables !!!!!!!!!!!!  !csv for tables
             /////////////////////////////////////
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
@@ -1573,7 +1616,7 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[3] == 'v' )
             if ( fetchline[4] == ' ' )
             {
- 	      fputs( strcsv2tex(  strcut(   fetchline , 4+2, strlen(  fetchline )) )   , fp5 );
+ 	      fputs( strcsv2tex(  strtext2tex(   strcut( fetchline , 4+2, strlen(  fetchline )) ) )   , fp5 );
   	      fputs( " ", fp5 );
   	      fputs( "\\", fp5 );
   	      fputs( "\\", fp5 );
@@ -1648,31 +1691,6 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            /////////////////////////////////////
-            /// for RAW or reviews !!!!!!!!!!!!
-            /////////////////////////////////////
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '|' )
-            if ( fetchline[1] == ' ' )
-            {
- 	      fputs(  strtxt2tex(   strcut(   fetchline , 1+2, strlen(  fetchline )) )   , fp5 );
-  	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
-            /////////////////////////////////////
-            /// for RAW or reviews !!!!!!!!!!!!
-            /////////////////////////////////////
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '|' )
-            if ( fetchline[1] == '|' )
-            if ( fetchline[2] == ' ' )
-            {
- 	      fputs(  strtxt2tex(   strcut(   fetchline , 2+2, strlen(  fetchline )) )   , fp5 );
-  	      fputs( "\\", fp5 );
-  	      fputs( "\\", fp5 );
-  	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
 
 
             /////////////////////////////////
@@ -2027,8 +2045,55 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+	    /////////////////
+            /// for easy raw to tex work
+            ////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '|' )
+            if ( fetchline[1] == ' ' )    //<- this help to have nice code
+            {
+ 	      fputs( strtxt2tex(  strcut(  fetchline , 1 +2, strlen( fetchline ))) , fp5 );
+  	      //  fputs( "\\", fp5 );
+  	      //  fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+            /////////////////////////////////////
+            /// for RAW or reviews !!!!!!!!!!!!
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '|' )
+            if ( fetchline[1] == ' ' )
+            {
+ 	      //fputs(  strtxt2tex(   strcut(   fetchline , 1+2, strlen(  fetchline )) )   , fp5 );
+  	      //fputs( "\n", fp5 );
+              //////////////
+ 	      fputs(  strtxt2tex(   strcut(   fetchline , 1+2, strlen(  fetchline )) )   , fp5 );
+  	      //fputs( "\\", fp5 );
+  	      //fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+            /////////////////////////////////////
+            /// for RAW or reviews !!!!!!!!!!!!
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '|' )
+            if ( fetchline[1] == '|' )
+            if ( fetchline[2] == ' ' )
+            {
+ 	      fputs(  strtxt2tex(   strcut(   fetchline , 2+2, strlen(  fetchline )) )   , fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
 
-            //// !beamer
+
+
+
+
+            //// !beamer     
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'b' )
@@ -4755,22 +4820,6 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-	    /////////////////
-            /// for easy raw to tex work
-            ////////////////
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '|' )
-            if ( fetchline[1] == ' ' )    //<- this help to have nice code
-            {
- 	      fputs( strtxt2tex(  strcut(  fetchline , 1 +2, strlen( fetchline ))) , fp5 );
-              if ( option_strtxt2tex_linefeed == 1 )
-              {
-  	         fputs( "\\", fp5 );
-  	         fputs( "\\", fp5 );
-              }
-  	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
 
 
 
@@ -5185,6 +5234,11 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
     */
+
+
+
+
+
 
 
 
@@ -5762,5 +5816,6 @@ int main( int argc, char *argv[])
 
 }
 
+/// \setcounter{section}{0}
 
 
