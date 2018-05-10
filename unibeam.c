@@ -41,6 +41,7 @@
 #include <time.h>
 
 
+
 // note !fig are regular figures for books, reports, and manuscripts (this is prefered).
 // note !img are images (similar) for classical easy to use work (quick, simple).
 
@@ -66,7 +67,11 @@ char slidemysection[PATH_MAX];
 char mygraphicspath[PATH_MAX];
 char myinputspath[PATH_MAX];
 
-int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+  7: math enumitem 
+// !qu to make active
+int list_numbering = 1;
+int question_qucounter = 1; 
+
+int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+  7: math enumitem , 8: exam list (exam in english), 
 int markup_language = 1; // 1:english , 2:french, 3:german
 int markup_item = 1;    //  1:default , 2:3pkt, 
 
@@ -78,8 +83,6 @@ int contentcode = 0;
 int option_system_call = 0;           // this will be 0 by default (depreciated)
 int option_strtxt2tex_linefeed = 1;   // this shall be 0 by default for compact documents
 
-// !qu to make active
-int list_numbering = 1;
 
 
 /*
@@ -1214,6 +1217,34 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+            /////////////////////////////////
+            /////////////////////////////////
+            /////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( markup_output_format == 8 ) 
+            if ( fetchline[1] == 'q' ) // used for english type of questions (single question list, with pts)
+            if ( fetchline[2] == 'u' )
+            if ( fetchline[3] == ' ' )
+            {
+ 	        fputs( "\\begin{itemize}\n" , fp5 );
+ 	        fputs( "\\item[{\\bfseries {" , fp5 );
+                fooc = snprintf( fooccharo, 50 , "%d", question_qucounter );
+ 	        fputs( fooccharo  , fp5 );
+ 	        fputs( "}}.)]{" , fp5 );
+                question_qucounter++;
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+                if ( markup_language == 1 )      fputs( " (3 Points)}" , fp5 );
+                else if ( markup_language == 2 ) fputs( " (3 Pts.)}" , fp5 );
+                else if ( markup_language == 3 ) fputs( " (3 Pkt.)}" , fp5 );
+                else if ( markup_language == 0 ) fputs( "}" , fp5 );
+ 	        fputs( "\n" , fp5 );
+ 	        fputs( "\\end{itemize}\n" , fp5 );
+ 	        fputs( "\\vspace{4cm}\n" , fp5 );
+  	      foundcode = 1;
+            }
+
+
 
 
 
@@ -1260,12 +1291,16 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
-            if ( foundcode == 0 )
+
+
+
+
+            if ( foundcode == 0 )    // !qu  
             if ( fetchline[0] == '!' )
+            if ( markup_output_format == 7 ) //!exam+
             if ( fetchline[1] == 'q' )
             if ( fetchline[2] == 'u' )
             if ( fetchline[3] == ' ' )
-            if ( markup_output_format == 7 ) //!exam+
             {
 	      if ( numberinglevel == 2)  
 	      {
@@ -2161,6 +2196,24 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[4] == 'l' )
             {
               markup_output_format = 2;
+  	      foundcode = 1;
+            } 
+
+
+            //// !exam list   or !exam-list 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'e' )
+            if ( fetchline[2] == 'x' )
+            if ( fetchline[3] == 'a' )
+            if ( fetchline[4] == 'm' )
+            if (( fetchline[5] == ' ' ) || ( fetchline[5] == '-' ))
+            if ( fetchline[6] == 'l' )
+            if ( fetchline[7] == 'i' )
+            if ( fetchline[8] == 's' )
+            if ( fetchline[9] == 't' )
+            {
+              markup_output_format = 8;
   	      foundcode = 1;
             } 
 
@@ -4066,8 +4119,13 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+
+
+
+
             ///////////////////////////// for questions with points
             /////////////////////////////
+            /*
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == '[' )
@@ -4087,10 +4145,19 @@ void nfileunimark( char *fileout, char *filein )
                 fputs( "\\addtocounter{unibullcounter}{1}\n" , fp5 );
 		numberinglevel = 1;
 	      }
+
+
 	      else if ( numberinglevel == 0)  
 	      {
  	        fputs( "\\begin{itemize}\n" , fp5 );
- 	        fputs( "\\item[{\\bfseries {\\arabic{unibullcounter}}}.)]{" , fp5 );
+
+ 	        fputs( "\\item[{\\bfseries {" , fp5 );
+                fooc = snprintf( fooccharo, 50 , "%d", question_qucounter );
+ 	        fputs( fooccharo  , fp5 );
+ 	        fputs( "}}.)]{" , fp5 );
+                question_qucounter++;
+
+ 	        //fputs( "\\item[{\\bfseries {\\arabic{unibullcounter}}}.)]{" , fp5 );
  	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
                 if ( markup_language == 1 )      fputs( " (3 Points)}" , fp5 );
                 else if ( markup_language == 2 ) fputs( " (3 Pts.)}" , fp5 );
@@ -4098,10 +4165,15 @@ void nfileunimark( char *fileout, char *filein )
                 else if ( markup_language == 0 ) fputs( "}" , fp5 );
  	        fputs( "\n" , fp5 );
                 fputs( "\\addtocounter{unibullcounter}{1}\n" , fp5 );
-		numberinglevel = 1;
+		//numberinglevel = 1;
+ 	        fputs( "\\end{itemize}\n" , fp5 );
+ 	        fputs( "\\vspace{4cm}\n" , fp5 );
 	      }
   	      foundcode = 1;
             }
+            */
+
+            
 
 
             /// FOR EXERCISES
@@ -4137,8 +4209,6 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
-
-
 
 
 
