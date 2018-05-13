@@ -3,7 +3,7 @@ Unibeam, the ultimate universal powerful markup language for minimalist TCC comp
 
 It allows to make documents reports slides presentation articles boooks...
 
-examples
+Example:
  https://raw.githubusercontent.com/spartrekus/Latex-Scientific-Presentation/master/scientific-presentation.bmr
- https://github.com/spartrekus/Latex-Scientific-Presentation
+ 
 
