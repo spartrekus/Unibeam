@@ -15,6 +15,7 @@
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
+
 #include <stdio.h>
 #if defined(__linux__)
 #define MYOS 1
@@ -41,9 +42,19 @@
 #include <time.h>
 
 
+// note that !img are images (similar) for classical easy to use work (quick, simple).
 
-// note !fig are regular figures for books, reports, and manuscripts (this is prefered).
-// note !img are images (similar) for classical easy to use work (quick, simple).
+/*
+Making slides using following is possible: 
+
+!clr
+!fig{figs/P01.jpg}{Sample P01}{}
+!info text below the picture
+
+!clr
+!fig{figs/P02.jpg}{Sample P02}{}
+*/
+
 
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
@@ -67,13 +78,28 @@ char slidemysection[PATH_MAX];
 char mygraphicspath[PATH_MAX];
 char myinputspath[PATH_MAX];
 
-// !qu to make active
+// for questions, to make active
 int list_numbering = 1;
 int question_qucounter = 1; 
 
-int markup_output_format = 1; // 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+  7: math enumitem , 8: exam list (exam in english), 
-int markup_language = 1; // 1:english , 2:french, 3:german
-int markup_item = 1;    //  1:default , 2:3pkt, 
+
+
+//////// LANGUAGE 
+int markup_output_format = 1; // type of doc: 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+ (with points) new and testing,    7: for maths with enumitem,  8: exam list i.e. the first approach, stable (exam in english), 
+// en+ gives doc language 4
+// 1: tex (default)
+// 2: html
+// 3: exam
+// 6: exam+ (new, default, started with !exam+) 
+// 7: math documentation  
+
+int markup_language = 1; // 1:english (standard, international), 2:french, 3:german, 4:en+ english i.e. en+ (for exam, e.g. 3 points)
+// with !set lang=en
+
+/////////////// (useful quick workaround)
+int markup_item = 1;    //  1:default , 2:3pkt,  //for rapid update
+
+
 
 int txtbeginreview = 0; 
 int txtrawcode = 0; 
@@ -891,6 +917,7 @@ char *filename_newext( char *str , char *newext )
 
 
 ///////////////////////////////////////////////////////////////////
+////////// 
 void nfileunimark( char *fileout, char *filein )
 {
   char poolfilename[PATH_MAX];
@@ -961,7 +988,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
           //////////////////////////////////////
-          if ( foundcode == 0 ) // low-level
+          if ( foundcode == 0 ) // low-level low level
           if ( fetchlinetmp[0] == '/' )
           if ( fetchlinetmp[1] == '/' )
           {
@@ -986,6 +1013,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 	    /////////////////
+            // quick, easy review work with adding just #
 	    /////////////////
             if ( foundcode == 0 ) // for review
             if ( fetchlinetmp[0] == '#' ) // low-level
@@ -1005,6 +1033,9 @@ void nfileunimark( char *fileout, char *filein )
         	 fputs( "\n", fp5 );
   	      foundcode = 1;
             }
+
+
+
 
 	    /////////////////
             if ( foundcode == 0 ) // 
@@ -1037,13 +1068,8 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
-
-
-
-
-
 	    /////////////////
+            /* old, removed
             if ( foundcode == 0 ) 
             if ( fetchlinetmp[0] == '!' ) // !head bla, old but ok.
             if ( fetchlinetmp[1] == 'h' )
@@ -1057,7 +1083,11 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "}\\\\", fp5 );
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
-            }
+            } */
+
+
+
+           /*
 	    /////////////////
 	    /////////////////
             if ( foundcode == 0 ) 
@@ -1070,9 +1100,7 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\\\\", fp5 );
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
-            }
-
-
+            } */
 
 
 
@@ -1090,8 +1118,8 @@ void nfileunimark( char *fileout, char *filein )
               fetchline[fetchi]=fetchlinetmp[fetchi];
               if ( fetchlinetmp[ fetchi ] == '!' ) 
 	         foundcmd = 1 ;
-              else if ( fetchlinetmp[ fetchi ] == '|' ) 
-	         foundcmd = 1 ;
+              //else if ( fetchlinetmp[ fetchi ] == '|' ) 
+	      // foundcmd = 1 ;
 	    }
 
 
@@ -1102,7 +1130,7 @@ void nfileunimark( char *fileout, char *filein )
           {
              if ( fetchline[0] != '!' ) 
              if ( fetchline[0] != '>' ) 
-             if ( fetchline[0] != '|' )  // there is only 2 modifiers
+             //if ( fetchline[0] != '|' )  // there is only 2 modifiers
              {
                  strncpy( fetchlinefoo, fetchline , PATH_MAX );
                  strncpy( fetchline , strtxt2tex( fetchlinefoo ) , PATH_MAX );
@@ -1136,6 +1164,39 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+           ////////////////////////////////////
+           if ( strcmp( fetchline, "" ) == 0 )
+	        unilistemptyline++;
+	      else
+	        unilistemptyline = 0;
+
+
+            //// closer, numbering itemize
+            if ( foundcode == 0 )
+	    if ( contentcode == 1 )
+	    if ( numberinglevel >= 1 )
+	    if ( unilistemptyline >= 1 )   // let set to one (1) line empty (testing)
+            {
+	      for ( fooi = 1 ; fooi <= numberinglevel ; fooi++)
+	      {
+                 if ( markup_output_format == 6 ) 
+	           fputs( "\\end{enumerate}\n" , fp5 );
+                 else
+	           fputs( "\\end{itemize}\n" , fp5 );
+	      }
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\n" , fp5 );
+	      numberinglevel = 0;
+  	      foundcode = 1;
+            }
+	    if ( numberinglevel <= 0 ) numberinglevel = 0;
+
+
+
+
+
+
+            /*
             ///////////////////////////////////
             ///////////////////////////////////
             //// !tex, quicker, faster and easier
@@ -1152,9 +1213,7 @@ void nfileunimark( char *fileout, char *filein )
               fputs( "\\begin{document}", fp5 );
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
-            } 
-
-
+            } */
 
 
 
@@ -1215,6 +1274,66 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+            //// !set lang=en+
+	    //if ( strcmp( fetchline, "!set lang=en+" ) == 0 ) //here begin
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 's' ) 
+            if ( fetchline[2] == 'e' ) 
+            if ( fetchline[3] == 't' ) 
+            if ( fetchline[4] == ' ' ) 
+            if ( fetchline[5] == 'l' ) 
+            if ( fetchline[6] == 'a' ) 
+            if ( fetchline[7] == 'n' ) 
+            if ( fetchline[8] == 'g' ) 
+            if ( fetchline[9] == '=' ) 
+            if ( fetchline[10] == 'e' ) 
+            if ( fetchline[11] == 'n' ) 
+            if ( fetchline[12] == '+' ) 
+            {
+              markup_language = 4; 
+  	      foundcode = 1;
+            }
+
+            /////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'l' ) 
+            if ( fetchline[2] == 'a' ) 
+            if ( fetchline[3] == 'n' ) 
+            if ( fetchline[4] == 'g' ) 
+            if ( fetchline[5] == ' ' ) 
+            if ( fetchline[6] == 'd' ) 
+            if ( fetchline[7] == 'e' ) 
+            {
+              markup_language = 3; 
+  	      foundcode = 1;
+            }
+
+            //// !set lang=en    (normal one)
+	    //if ( strcmp( fetchline, "!set lang=en" ) == 0 ) //here begin
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 's' ) 
+            if ( fetchline[2] == 'e' ) 
+            if ( fetchline[3] == 't' ) 
+            if ( fetchline[4] == ' ' ) 
+            if ( fetchline[5] == 'l' ) 
+            if ( fetchline[6] == 'a' ) 
+            if ( fetchline[7] == 'n' ) 
+            if ( fetchline[8] == 'g' ) 
+            if ( fetchline[9] == '=' ) 
+            if ( fetchline[10] == 'e' ) 
+            if ( fetchline[11] == 'n' ) 
+            {
+              markup_language = 1; 
+  	      foundcode = 1;
+            }
+
+
+
+
+
 
 
             /////////////////////////////////
@@ -1249,7 +1368,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
             //// Math list 
-            //// !mathlist  // with >> and !qu 
+            //// !mathlist, which is too working with >> and !qu 
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == 'm' )
@@ -1295,18 +1414,25 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            if ( foundcode == 0 )    // !qu  
+
+
+
+
+            ////////////////////////////////////////////
+            ////////////////////////////////////////////
+            ////////////////////////////////////////////
+            if ( foundcode == 0 )    // !qu  (main for maths)
+            if ( beamercode == 0 ) 
             if ( fetchline[0] == '!' )
-            if ( markup_output_format == 7 ) //!exam+
             if ( fetchline[1] == 'q' )
             if ( fetchline[2] == 'u' )
             if ( fetchline[3] == ' ' )
+            if ( markup_output_format == 7 ) //this is for maths  (note here left output format)
             {
 	      if ( numberinglevel == 2)  
 	      {
  	        fputs( "\\item " , fp5 );
  	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
- 	        //fputs( "" , fp5 );
  	        fputs( "\n" , fp5 );
 		numberinglevel = 2;
                 list_numbering++;
@@ -1316,7 +1442,6 @@ void nfileunimark( char *fileout, char *filein )
  	        fputs( "\\begin{enumerate}\n" , fp5 );
  	        fputs( "\\item " , fp5 );
  	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
- 	        //fputs( " (3 Pkt.)" , fp5 );
  	        fputs( "\n" , fp5 );
 		numberinglevel = 2;
                 list_numbering++;
@@ -1329,12 +1454,87 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
-
-
-
-     //// EXAM+ 
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            if ( foundcode == 0 )   // !qu questions, for type !exam+ 
+            if ( beamercode == 0 ) 
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'q' )
+            if ( fetchline[2] == 'u' )
+            if ( fetchline[3] == ' ' )
+            if ( markup_output_format == 6 ) //for !exam+
+            {
+	      if ( numberinglevel == 2)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+                if      ( markup_language == 4 )    fputs( " (3 points)" , fp5 );
+                else if ( markup_language == 3 )    fputs( " (3 Pkt.)}" , fp5 );
+                else if ( markup_language == 1 )    fputs( " (3 points)" , fp5 );
+                else fputs( " (3 Pkt.)" , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\begin{enumerate}\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
+                if      ( markup_language == 4 )    fputs( " (3 points)" , fp5 );
+                else if ( markup_language == 1 )    fputs( " (3 points)" , fp5 );
+                else if ( markup_language == 3 )    fputs( " (3 Pkt.)}" , fp5 );
+                else fputs( " (3 Pkt.)" , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
+            }
+            /////////////////////////////////
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            if ( foundcode == 0 )   // !qu questions, for type !exam+, but !nqu has no points (for custom change) 
+            if ( beamercode == 0 ) 
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'n' )
+            if ( fetchline[2] == 'q' )
+            if ( fetchline[3] == 'u' )
+            if ( fetchline[4] == ' ' )
+            if ( markup_output_format == 6 ) //for !exam+
+            {
+	      if ( numberinglevel == 2)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\begin{enumerate}\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
+            }
+            /////////////////////////////////
+            //
+            //
+            //
+            //
+            //
+            //
+            /////////////////////////////////
+            /// for exams, especially !exam+ 
             if ( foundcode == 0 )
+            if ( beamercode == 0 )
             if ( fetchline[0] == '>' )
             if ( fetchline[1] == '>' )
             if ( fetchline[2] == ' ' )
@@ -1360,34 +1560,7 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '!' )
-            if ( fetchline[1] == 'q' )
-            if ( fetchline[2] == 'u' )
-            if ( fetchline[3] == ' ' )
-            if ( markup_output_format == 6 ) //!exam+
-            {
-	      if ( numberinglevel == 2)  
-	      {
- 	        fputs( "\\item " , fp5 );
- 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
- 	        fputs( " (3 Pkt.)" , fp5 );
- 	        fputs( "\n" , fp5 );
-		numberinglevel = 2;
-                list_numbering++;
-	      }
-	      else if ( numberinglevel == 1)  
-	      {
- 	        fputs( "\\begin{enumerate}\n" , fp5 );
- 	        fputs( "\\item " , fp5 );
- 	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
- 	        fputs( " (3 Pkt.)" , fp5 );
- 	        fputs( "\n" , fp5 );
-		numberinglevel = 2;
-                list_numbering++;
-	      }
-  	      foundcode = 1;
-            }
+
 
 
 
@@ -1451,22 +1624,6 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
-
-
-
-
-
-
-
-
-
-
-
-           ////////////////////////////////////
-           if ( strcmp( fetchline, "" ) == 0 )
-	        unilistemptyline++;
-	      else
-	        unilistemptyline = 0;
 
 
 
@@ -1729,7 +1886,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
             /////////////////////////////////
-            if ( foundcode == 0 )
+            if ( foundcode == 0 )  // !vsp 
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'v' )
             if ( fetchline[2] == 's' )
@@ -1740,6 +1897,7 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
  	      fputs( "}" , fp5 );
   	      fputs( "\n", fp5 );
+	      unilistemptyline++;
   	      foundcode = 1;
             }
 
@@ -1818,6 +1976,46 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( "\n" , fp5 );
  	      fputs( "\\usepackage{tikz}\n" , fp5 );
  	      fputs( "\n" , fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+
+            //////////////////////////////////
+            //// !pdfpage
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) // for left at 0 char pos
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'd' )
+            if ( fetchline[3] == 'f' )
+            if ( fetchline[4] == 'p' )
+            if ( fetchline[5] == 'a' )
+            if ( fetchline[6] == 'g' )
+            if ( fetchline[7] == 'e' )
+            ////
+            {
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\\usepackage{pdfpages}\n" , fp5 );
+ 	      fputs( "\n" , fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+            ///////////// !pdf for pdfpages
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'd' )
+            if ( fetchline[3] == 'f' )
+            if ( fetchline[4] == '{' )
+            {
+  	      fputs( "\\includepdf{", fp5 );
+ 	      fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	      fputs( "}\n", fp5 );
   	      foundcode = 1;
             }
 
@@ -1922,6 +2120,20 @@ void nfileunimark( char *fileout, char *filein )
 	      txtrawcode = 1;
   	      foundcode = 1;
             }
+
+            // !noraw, useful for reviewers (like !beginraw)
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'n' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 'r' )
+            if ( fetchline[4] == 'a' )
+            if ( fetchline[5] == 'w' )
+            {
+	      txtrawcode = 0;
+  	      foundcode = 1;
+            }
+
 
 
 
@@ -2083,6 +2295,7 @@ void nfileunimark( char *fileout, char *filein )
 	    /////////////////
             /// for easy raw to tex work
             ////////////////
+            /*
             if ( foundcode == 0 )
             if ( fetchline[0] == '|' )
             if ( fetchline[1] == ' ' )    //<- this help to have nice code
@@ -2091,11 +2304,14 @@ void nfileunimark( char *fileout, char *filein )
   	      //  fputs( "\\", fp5 );
   	      //  fputs( "\\", fp5 );
   	      fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
+  	      foundcode = 1; 
+            } */
+ 
+
             /////////////////////////////////////
             /// for RAW or reviews !!!!!!!!!!!!
             /////////////////////////////////////
+            /*
             if ( foundcode == 0 )
             if ( fetchline[0] == '|' )
             if ( fetchline[1] == ' ' )
@@ -2123,6 +2339,7 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             }
+            */
 
 
 
@@ -2284,23 +2501,6 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[3] == 'c' )
             if ( fetchline[4] == ' ' )
             {
-              /*
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "\\clearpage" , PATH_MAX );
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "\\begin{frame}" , PATH_MAX );
-
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
-              strncat( slidebufferdata[foxy] , "\\frametitle{"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-              strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
-
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "\\tableofcontents" , PATH_MAX );
-              foxy++;
-              strncpy( slidebufferdata[foxy] , "\\end{frame}" , PATH_MAX );
-               */
  	      fputs( "\\clearpage\n" , fp5 );
  	      fputs( "\\begin{frame}\n" , fp5 );
  	      fputs( "\\frametitle{" , fp5 );
@@ -2313,8 +2513,6 @@ void nfileunimark( char *fileout, char *filein )
 	      beamerlevel = 0;
   	      foundcode = 1;
             }
-
-
 
 
 
@@ -2418,11 +2616,14 @@ void nfileunimark( char *fileout, char *filein )
               strncat( slidebufferdata[foxy] , strtrim( strcut( fetchline, 1+2, strlen(fetchline))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
               strncat( slidebufferdata[foxy] , ""  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
               ///////////////
-
 	        beamerlevel = 1;
 	      }
   	      foundcode = 1;
             }
+
+
+
+
 
             //////////////////////////////////
             if ( foundcode == 0 )
@@ -2583,12 +2784,15 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+
+
+
             // !info bla for beamer
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
 	    if ( beamerlevel >= 1 )
-            if ( fetchline[0] == '!' )
+            if ( fetchline[0] == '!' ) // !info without {} is for one
             if ( fetchline[1] == 'i' )
             if ( fetchline[2] == 'n' )
             if ( fetchline[3] == 'f' )
@@ -2598,17 +2802,19 @@ void nfileunimark( char *fileout, char *filein )
               ///////////////
               //strncpy( slidebufferfignote,  strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , PATH_MAX );
  	      //fputs( "\\textit{" , fp5 );
-              strncpy( slidebufferfignote, "\\textit{"  , PATH_MAX );
+              //strncpy( slidebufferfignote, "\\textit{"  , PATH_MAX );
+              strncpy( slidebufferfignote, "\\begin{center}\\textit{"  , PATH_MAX );
               strncat( slidebufferfignote , 
               strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) 
               , PATH_MAX - strlen( slidebufferfignote  ) -1 );
-              strncat( slidebufferfignote , "}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+              //strncat( slidebufferfignote , "}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+              strncat( slidebufferfignote , "}\\end{center}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
               slidebuffernot = 1;
   	      foundcode = 1;
             }
 
 
-            // !info{ for beamer
+            // !info{ for beamer, this will be !infoab implicit, !info with {} {} is for two right and left
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
@@ -2639,7 +2845,8 @@ void nfileunimark( char *fileout, char *filein )
               {
                 ///////////////
                 strncpy( slidebufferfignote,  ""  , PATH_MAX );
-                strncat( slidebufferfignote , "{\\small " , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+                strncat( slidebufferfignote , "\\begin{center}{\\small " , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+                //strncat( slidebufferfignote , "{\\small " , PATH_MAX - strlen( slidebufferfignote  ) -1 );
                 strncat( slidebufferfignote , fbasenoext( strtxt2tex( strdelimit( fetchline,  '{' ,'}' ,  1 ) )) , PATH_MAX - strlen( slidebufferfignote  ) -1 );
   
                 strncat( slidebufferfignote , " (Left) and " , PATH_MAX - strlen( slidebufferfignote  ) -1 );
@@ -2647,7 +2854,8 @@ void nfileunimark( char *fileout, char *filein )
                 strncat( slidebufferfignote , fbasenoext(strtxt2tex( strdelimit( fetchline,  '{' ,'}' ,  2 ) ) ) , PATH_MAX - strlen( slidebufferfignote  ) -1 );
   
                 strncat( slidebufferfignote , " (Right)" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
-                strncat( slidebufferfignote , "}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+                //strncat( slidebufferfignote , "}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
+                strncat( slidebufferfignote , "}\\end{center}" , PATH_MAX - strlen( slidebufferfignote  ) -1 );
                 slidebuffernot = 1;
               }
   	      foundcode = 1;
@@ -2657,11 +2865,13 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            // !fig for beamer
+
+
+            // !fig for beamer (i.e. !fig{pic.png})
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
-	    if ( beamerlevel >= 1 )
+	    //if ( beamerlevel >= 1 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == 'f' )
             if ( fetchline[2] == 'i' )
@@ -2670,13 +2880,42 @@ void nfileunimark( char *fileout, char *filein )
             {
               slidebufferfig = 1; 
               ///////////////
-              char foofilefound[PATH_MAX];
-              strncpy( foofilefound, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
-              if ( strstr( foofilefound , "/" ) != 0 ) 
-              if ( fexist( foofilefound ) == 1 ) 
+              //char foofilefound[PATH_MAX];
+              //strncpy( foofilefound, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+              //if ( strstr( foofilefound , "/" ) != 0 ) 
+              //if ( fexist( foofilefound ) == 1 ) 
+              //{
+              //}
+	      if ( beamerlevel >= 1 )
               {
+                  // if you wanna give regular slides
+                  strncpy( slidebufferfigfile, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
               }
-              strncpy( slidebufferfigfile, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+	      else if ( strcount( fetchline, '}' ) >= 2 )
+	      {
+                  // or, new automatic, allows to build faster slides
+                  strncpy( slidebufferfigfile, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+                  // after pic, bring text
+                  foxy++;//
+                  strncpy( slidebufferdata[foxy] , "\\begin{itemize}" , PATH_MAX );
+
+                  foxy++;//
+                  strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
+                  strncat( slidebufferdata[foxy] , "\\item "  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+
+                  strncat( slidebufferdata[foxy] , strdelimit( fetchline,  '{' ,'}' ,  2 )   , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                  strncat( slidebufferdata[foxy] , ""  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                  //foxy++;//
+                  //strncpy( slidebufferdata[foxy] , "\\end{itemize}" , PATH_MAX );
+                  //beamerlevel = 0;
+                  beamerlevel = 1;
+              }
+              else 
+              {
+                  // in any other choices
+                  strncpy( slidebufferfigfile, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+              }
+              ////////////////
   	      foundcode = 1;
               slidebufferfig = 1; 
             }
@@ -2710,7 +2949,9 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            // !figat for beamer
+
+
+            // !figat for beamer, image and text
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
@@ -2734,6 +2975,37 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
               slidebufferfig = 3; 
             }
+
+
+            // !textfig for beamer
+            if ( foundcode == 0 )
+	    if ( beamercode == 1 )
+	    if ( contentcode == 1 )
+	    if ( beamerlevel >= 1 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 't' )
+            if ( fetchline[2] == 'e' )
+            if ( fetchline[3] == 'x' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == 'f' )
+            if ( fetchline[6] == 'i' )
+            if ( fetchline[7] == 'g' )
+            if ( fetchline[8] == '{' )
+            {
+              slidebufferfig = 1; 
+              ///////////////
+              char foofilefound[PATH_MAX];
+              strncpy( foofilefound, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+              if ( strstr( foofilefound , "/" ) != 0 ) 
+              if ( fexist( foofilefound ) == 1 ) 
+              {
+              }
+              strncpy( slidebufferfigfile, strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX );
+  	      foundcode = 1;
+              slidebufferfig = 4; 
+            }
+
+
 
 
 
@@ -2914,11 +3186,13 @@ void nfileunimark( char *fileout, char *filein )
             }*/
 
 
+            // process the content of the slide
 	    // closer (beamer)
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
 	    if ( beamerlevel >= 1 )
+	    //if ( unilistemptyline >= 1 )
 	    if ( unilistemptyline >= 1 )
             {
 	      printf ( " Found unilistemptyline (closer): beamer level %d \n", beamerlevel );
@@ -2928,6 +3202,9 @@ void nfileunimark( char *fileout, char *filein )
                  strncpy( slidebufferdata[foxy] , "\\end{itemize}" , PATH_MAX );
 	      }
 
+
+              //////////////////////////////////////////////
+              // let's begin
               //////////////////////////////////////////////
               slidebufferfoundsection = 0;
 	      for ( fooi = 1 ; fooi <= foxy ; fooi++)
@@ -2948,23 +3225,28 @@ void nfileunimark( char *fileout, char *filein )
                       fputs( "}\n"  , fp5 );
               }
              
+
               ////////////////////////////////////////////////
+              /// loop according to line content
 	      printf ( " Print out foxy \n" );
 	      for ( fooi = 1 ; fooi <= foxy ; fooi++)
 	      {
                  fputs( slidebufferdata[ fooi ] , fp5 );
 
                  if ( slidebufferfig >= 1 )
-                 if ( strcmp( slidebufferdata[ fooi ] , "\\begin{frame}" ) == 0 )
+                 if ( strcmp( slidebufferdata[ fooi ] , "\\begin{frame}" ) == 0 ) //ok
                  {
                       fputs( "\n" , fp5 );
                       if ( slidebufferfig == 1 )
-                         fputs( "\\fitimage{"  , fp5 );
+                         fputs( "\\fitimage{"  , fp5 );    // one pic
                       else if ( slidebufferfig == 2 )
-                         fputs( "\\fitimageab{"  , fp5 );
+                         fputs( "\\fitimageab{"  , fp5 );  // two pics
                       else if ( slidebufferfig == 3 )
-                         fputs( "\\fitimageat{"  , fp5 );
+                         fputs( "\\fitimageat{"  , fp5 );  // pic and text
+                      else if ( slidebufferfig == 4 )
+                         fputs( "\\textfig{"  , fp5 );  // pic and text
                  }
+
 
                  if ( slidebufferfoundsection == 0 ) 
                  {
@@ -2976,8 +3258,23 @@ void nfileunimark( char *fileout, char *filein )
 	      } // end of loop
 
 
+              /*
+              if ( slidebufferfig == 4 ) //textfig
+              {
+                foxy++;//
+                fputs( "\\begin{minipage}{0.5\\textwidth}\n" , fp5 );
+                strncpy( slidebufferdata[foxy] , "\\includegraphics[width=\\textwidth]{" , PATH_MAX );
+                strncat( slidebufferdata[foxy] ,  slidebufferfigfile  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 ); 
+                strncat( slidebufferdata[foxy] , "}"  , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+                fooi = foxy ; 
+                fputs( slidebufferdata[ fooi ] , fp5 );
+                fputs( "\n" , fp5 );
+                fputs( "\\end{minipage}\n" , fp5 );
+                slidebufferfig=0;
+              } */ 
+
               /// add fig fitimage if indicated
-              if ( slidebufferfig == 1 )
+              if ( ( slidebufferfig == 1 ) || ( slidebufferfig == 4 ))
 	      {
                 foxy++;//
                 strncpy( slidebufferdata[foxy] , "}{" , PATH_MAX );
@@ -2991,6 +3288,7 @@ void nfileunimark( char *fileout, char *filein )
                 fputs( "\n" , fp5 );
                 slidebufferfig=0;
 	      }
+
               else if (( slidebufferfig == 2 ) || ( slidebufferfig == 3 ))
 	      {
                 foxy++;//
@@ -3568,7 +3866,6 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
             ///////////// !fig{myfigure.png} regular fig 
             ///////////// the regular fig to place figures 
             if ( foundcode == 0 )
@@ -3578,7 +3875,6 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[3] == 'g' )
             if ( fetchline[4] == '{' )
             {
-	      //if ( strcount( fetchline, '}' ) >= 3 )
 	      if ( strcount( fetchline, '}' ) >= 2 )
 	      {
  	        fputs( "\\unifigplus{" , fp5 );
@@ -4058,16 +4354,23 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             } 
+            //// !begintex
+            if ( foundcode == 0 )
+            if ( fetchcmdline[0] == '!' )
+	    if ( strcmp( fetchcmdline, "!begintex" ) == 0 )
+            {
+              fputs( "\\documentclass[11pt]{article}\n", fp5 );
+              fputs( "\\begin{document}\n", fp5 );
+  	      foundcode = 1;
+            } 
 
 
 
 
 
 
-
-
-
-            ///////////////////////////// ![nu] clause   // TO KEEP!!!
+            /* removed
+            /////////////////////////////
             // >> text, main
             // ![nu] text1 (with auto numbering)
             // ![nu] text2
@@ -4091,6 +4394,7 @@ void nfileunimark( char *fileout, char *filein )
 		numberinglevel = 1;
   	        foundcode = 1;
             }
+            */
 
 
 
@@ -4100,6 +4404,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+            /*
             /////// FOR EXAMS
             ///////////////////////////// for questions with points
             /////////////////////////////
@@ -4118,6 +4423,7 @@ void nfileunimark( char *fileout, char *filein )
   	      numberinglevel = 1;
   	      foundcode = 1;
             }
+            */
 
 
 
@@ -4220,6 +4526,7 @@ void nfileunimark( char *fileout, char *filein )
 
             ///////////////////////////// 
             /// sometimes useful, with !qu 
+            /// Just the regular 
             /// Simple, and relatively easy
             ///////////////////////////// 
             if ( foundcode == 0 )
@@ -4299,27 +4606,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-            //// closer, numbering itemize
-            if ( foundcode == 0 )
-	    if ( contentcode == 1 )
-	    if ( numberinglevel >= 1 )
-	    if ( unilistemptyline >= 1 ) 
-            {
-	      for ( fooi = 1 ; fooi <= numberinglevel ; fooi++)
-	      {
-                 if ( markup_output_format == 6 ) 
-	           fputs( "\\end{enumerate}\n" , fp5 );
-                 else
-	           fputs( "\\end{itemize}\n" , fp5 );
-	      }
- 	      fputs( "\n" , fp5 );
- 	      fputs( "\n" , fp5 );
-	      numberinglevel = 0;
-  	      foundcode = 1;
-            }
-	    if ( numberinglevel <= 0 ) numberinglevel = 0;
-
-
+            // emptyline was here
 
 
 
@@ -4626,6 +4913,23 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+            if ( foundcode == 0 ) // !center 
+            if ( fetchcmdline[0] == '!' )
+            if ( fetchcmdline[1] == 'c' )
+            if ( fetchcmdline[2] == 'e' )
+            if ( fetchcmdline[3] == 'n' )
+            if ( fetchcmdline[4] == 't' )
+            if ( fetchcmdline[5] == 'e' )
+            if ( fetchcmdline[6] == 'r' )
+            if ( fetchcmdline[7] == ' ' )
+            {
+ 	      fputs( "\\begin{center}" , fp5 );
+ 	      fputs( strcut( fetchcmdline, 7+2, strlen(fetchcmdline)) , fp5 );
+ 	      fputs( "\\end{center}" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
 
 
 	    /////////////////
@@ -4918,6 +5222,15 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+	    /////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+	    if ( strcmp( fetchline, "!smallskip" ) == 0 )
+            {
+ 	      fputs( "\\smallskip" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
 
 
 	    /////////////////
@@ -4960,10 +5273,56 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+            ///////////////////
+            ///////////////////
+            ///////////////////
+            ///////////////////
+            if ( foundcode == 0 ) // !gback{} //for beamer background
+            if ( 
+            ( fetchline[0] ==  '!' ) && ( fetchline[1] == 'g' ) && ( fetchline[2] == 'b' ) && 
+              ( fetchline[3] == 'a' ) && ( fetchline[4] == 'c' ) && ( fetchline[5] == 'k' ) && ( fetchline[6] == '{' )
+
+            )
+            {
+	      char fileinputsrc[PATH_MAX];
+	      strncpy( fileinputsrc, "", PATH_MAX );
+              strncat( fileinputsrc , strdelimit( fetchline,  '{' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+              //#elif defined(_WIN32)
+              //#elif defined(_WIN64)
+	      if ( fileinputsrc[0] == '~' )
+	      {
+	         strncpy( fileinputsrc, "", PATH_MAX );
+                 strncat( fileinputsrc , getenv( "HOME" ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+                 strncat( fileinputsrc , strdelimit( fetchline,  '~' ,'}' ,  1 ) , PATH_MAX - strlen( fileinputsrc ) -1 );
+	      }
+                
+              if ( fileinputsrc[ strlen( fileinputsrc) -1 ] != '/' )
+              {
+                //printf( "graphicspath: PC must add / for tailing\n" );
+                //strncat( fileinputsrc , "/" , PATH_MAX - strlen( fileinputsrc ) -1 );
+              }
+              /// fputs( "\\graphicspath{{", fp5 );
+              //fputs/\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{~/figs/beamer.jpg}}
+              fputs( "\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth,height=\\paperheight]{", fp5 );
+  	      fputs( fileinputsrc  , fp5 );
+  	      fputs( "}}", fp5 );
+  	      fputs( "\n", fp5 );
+
+              strncpy( mygraphicspath, fileinputsrc , PATH_MAX );
+  	      foundcode = 1;
+            }
 
 
 
 
+
+
+
+
+
+            ///////////////////////////
+            ///////////////////////////
+            ///////////////////////////
             if ( foundcode == 0 ) // !gpath{}
             if (
             (( fetchline[0] ==  '!' ) && ( fetchline[1] == 'g' ) && ( fetchline[2] == 'p' ) && ( fetchline[3] == 'a' ) && ( fetchline[4] == 't' ) && ( fetchline[5] == 'h' ) && ( fetchline[6] == '{' ))
@@ -4999,6 +5358,14 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
+
+            ///////////////////////////
+            ///////////////////////////
+            ///////////////////////////
+            ///////////////////////////
             if ( foundcode == 0 ) // !ipath{}
             if (( fetchline[0] ==  '!' ) && ( fetchline[1] == 'i' ) && ( fetchline[2] == 'p' ) && ( fetchline[3] == 'a' ) && ( fetchline[4] == 't' ) && ( fetchline[5] == 'h' ) && ( fetchline[6] == '{' ))
 
@@ -5389,6 +5756,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+/*
 ///////////////////////////////////
 int question_continue()
 {
@@ -5414,6 +5782,9 @@ int question_continue()
 	    }
 	    return foo; 
 }
+*/
+
+
 
 
 
@@ -5553,6 +5924,15 @@ int main( int argc, char *argv[])
     }
 
 
+    ////////////////////////////////////////////////////////
+    if ( argc == 4)
+      if ( strcmp( argv[1] , "fetch" ) ==  0 ) 
+      if ( strcmp( argv[2] , "logo" ) ==  0 ) 
+      {
+         system( " wget \"https://raw.githubusercontent.com/spartrekus/Linux-Logos-Imgs/master/Tux-Logos/220px-Tux.png\"   -O tux.png " );
+         return 0;
+      }
+
 
     ///////////////////////////////////////////
     ///////////////////////////////////////////
@@ -5607,6 +5987,7 @@ int main( int argc, char *argv[])
           fpout = fopen( argv[3] , "ab+");
             fputs( "#include{beamer.mrk}\n", fpout );
             fputs( "!gpath{figs}\n", fpout );
+            fputs( "///!gback{~/include/img/beamer.jpg}\n", fpout );
             fputs( "!beamer\n", fpout );
             fputs( "!begin\n", fpout );
             fputs( "!clr\n", fpout );
@@ -5628,19 +6009,22 @@ int main( int argc, char *argv[])
    ///////////////////////////////////////////
     if ( argc == 3)
       if ( strcmp( argv[ 1 ] , "--new"  ) == 0  )
-      if ( strcmp( argv[ 2 ] , "slides"  ) == 0 ) 
+      if ( strcmp( argv[ 2 ] , "slides"  ) == 0 ) // nconsole
       {
           printf( "Create example beamer\n");
           fpout = fopen( "example.bmr" , "ab+");
             fputs( "#include{beamer.mrk}\n", fpout );
-            fputs( "//!gpath{figs}\n", fpout );
+            fputs( "!gpath{figs}\n", fpout );
+            fputs( "///!gback{~/include/img/beamer.jpg}\n", fpout );
             fputs( "!beamer\n", fpout );
             fputs( "!begin\n", fpout );
             fputs( "!section Section\n", fpout );
             fputs( "!clr\n", fpout );
             fputs( "> Header\n", fpout );
             fputs( "- this is an example\n", fpout );
-            fputs( "// !fig{pic.png}\n", fpout );
+            fputs( "//!fig{fig.png}\n", fpout );
+            fputs( "//!textfig{fig.png}\n", fpout );
+            fputs( "//!figab{fig.png}{fig.png}\n", fpout );
             fputs( "\n", fpout );
           fclose( fpout );
           return 0;
@@ -5887,5 +6271,7 @@ int main( int argc, char *argv[])
 }
 
 /// \setcounter{section}{0}
+
+
 
 
