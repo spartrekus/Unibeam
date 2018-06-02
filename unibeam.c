@@ -42,23 +42,12 @@
 #include <time.h>
 
 
-// note that !img are images (similar) for classical easy to use work (quick, simple).
-
-/*
-Making slides using following is possible: 
-
-!clr
-!fig{figs/P01.jpg}{Sample P01}{}
-!info text below the picture
-
-!clr
-!fig{figs/P02.jpg}{Sample P02}{}
-*/
 
 
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 /// global vars which can be removed for better readability 
+//  note that !img are images (similar) for classical easy to use work (quick, simple).
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 char doc_version[PATH_MAX];
@@ -1930,6 +1919,7 @@ void nfileunimark( char *fileout, char *filein )
             /////////////////////////////////
             /////////////////////////////////
             if ( foundcode == 0 )   // !gfx 
+            if ( beamercode != 1 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'g' )
             if ( fetchline[2] == 'f' )
@@ -1947,6 +1937,32 @@ void nfileunimark( char *fileout, char *filein )
 
 
             /////////////////////////////////
+            if ( foundcode == 0 )   // !placeins 
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'l' )
+            if ( fetchline[3] == 'a' )
+            if ( fetchline[4] == 'c' )
+            if ( fetchline[5] == 'e' )
+            if ( fetchline[6] == 'i' )
+            if ( fetchline[7] == 'n' )
+            if ( fetchline[8] == 's' )
+            {
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\\usepackage[section]{placeins}\n" , fp5 ); // new 
+ 	      fputs( "\n" , fp5 );
+  	      foundcode = 1;
+            }
+            /////////////////////////////////
+            // Try \begin{figure}[!htb]. In nearly all cases it helps.
+            /////////////////////////////////
+
+
+
+
+
+
+            /////////////////////////////////
             /////////////////////////////////
             if ( foundcode == 0 )   // !space 
             if ( fetchline[0] == '!' ) 
@@ -1957,8 +1973,8 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[5] == 'e' )
             {
  	      fputs( "\n" , fp5 );
-              fputs( "%//\\renewcommand{\\baselinestretch}{1.5}\n", fp5);
-              fputs( "%//\\setlength{\\parindent}{10ex}\n", fp5);
+              //fputs( "//\\renewcommand{\\baselinestretch}{1.5}\n", fp5);
+              //fputs( "%//\\setlength{\\parindent}{10ex}\n", fp5);
               fputs( "\\setlength{\\parskip}{10pt plus 1pt minus 1pt}\n" , fp5 );
  	      fputs( "\n" , fp5 );
   	      foundcode = 1;
@@ -2022,7 +2038,7 @@ void nfileunimark( char *fileout, char *filein )
 
             //////////////////////////////////
             //// !package !packages 
-            if ( foundcode == 0 )
+            if ( foundcode  == 0 )
             if ( fetchline[0] == '!' ) // for left at 0 char pos
             if ( fetchline[1] == 'p' )
             if ( fetchline[2] == 'a' )
@@ -2033,22 +2049,25 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[7] == 'e' )
             ////
             {
- 	      fputs( "\n" , fp5 );
- 	      fputs( "\\usepackage{url}\n" , fp5 );
- 	      fputs( "\\usepackage{hyperref}\n" , fp5 );
- 	      fputs( "\\usepackage{graphicx}\n" , fp5 );
- 	      fputs( "\\usepackage{grffile}\n" , fp5 );
- 	      fputs( "\\usepackage{pdfpages}\n" , fp5 );
- 	      //fputs( "\\usepackage{gensymb}\n" , fp5 ); //symbols
- 	      fputs( "\\usepackage{wallpaper}\n" , fp5 );
- 	      fputs( "\n" , fp5 );
- 	      fputs( "\\usepackage{epstopdf}\n" , fp5 );
- 	      fputs( "\\usepackage{enumitem}\n" , fp5 );  // for >>
- 	      fputs( "\n" , fp5 );
- 	      fputs( "\\usepackage{soul}\n" , fp5 );      // for reviews
- 	      fputs( "\n" , fp5 );
-              fputs( "\\sloppy\n", fp5 );
-              fputs( "\\usepackage[none]{hyphenat}\n", fp5 );
+              if ( beamercode != 1 ) 
+              { // necessary for bullets of beamer!, ideally !beamer !packages !begin
+       	         fputs( "\n" , fp5 );
+       	         fputs( "\\usepackage{url}\n" , fp5 );
+       	         fputs( "\\usepackage{hyperref}\n" , fp5 );
+       	         fputs( "\\usepackage{graphicx}\n" , fp5 );
+       	         fputs( "\\usepackage{grffile}\n" , fp5 );
+       	         fputs( "\\usepackage{pdfpages}\n" , fp5 );
+       	         //fputs( "\\usepackage{gensymb}\n" , fp5 ); //symbols
+       	         fputs( "\\usepackage{wallpaper}\n" , fp5 );
+       	         fputs( "\n" , fp5 );
+       	         fputs( "\\usepackage{epstopdf}\n" , fp5 );
+       	         fputs( "\\usepackage{enumitem}\n" , fp5 );  // for >>
+       	         fputs( "\n" , fp5 );
+       	         fputs( "\\usepackage{soul}\n" , fp5 );      // for reviews
+       	         fputs( "\n" , fp5 );
+                 fputs( "\\sloppy\n", fp5 );
+                 fputs( "\\usepackage[none]{hyphenat}\n", fp5 );
+              }
   	      foundcode = 1;
             } 
 
@@ -2871,7 +2890,6 @@ void nfileunimark( char *fileout, char *filein )
             if ( foundcode == 0 )
 	    if ( beamercode == 1 )
 	    if ( contentcode == 1 )
-	    //if ( beamerlevel >= 1 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == 'f' )
             if ( fetchline[2] == 'i' )
@@ -3864,16 +3882,106 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
-
             ///////////// !fig{myfigure.png} regular fig 
             ///////////// the regular fig to place figures 
+            ///////////// !fig{pic.png}{Text info}{ref for cite}
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' ) 
             if ( fetchline[1] == 'f' )
             if ( fetchline[2] == 'i' )
             if ( fetchline[3] == 'g' )
             if ( fetchline[4] == '{' )
+            {
+	      if ( strcount( fetchline, '}' ) >= 2 )
+	      {
+ 	        fputs( "\\begin{figure}\n" , fp5 );
+ 	        fputs( "\\centering\n" , fp5 );
+ 	        fputs( "\\includegraphics[width=1.0\\textwidth,keepaspectratio]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+
+ 	        fputs( "\\caption{" , fp5 );
+	        fputs( strtxt2tex( strdelimit(  fetchline  ,  '{' ,'}' , 2 ) ) , fp5 );
+  	        fputs( "}\n", fp5 );
+
+ 	        fputs( "\\end{figure}\n" , fp5 );
+	      }
+	      else //normal
+	      {
+  	        fputs( "\\begin{center}\n", fp5 );
+  	        fputs( "\\includegraphics[width=1.0\\textwidth]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        fputs( "\\end{center}\n", fp5 );
+	      }
+  	      foundcode = 1;
+            }
+
+
+
+
+
+
+            ///////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////
+            ///////////// Unterlagen
+            ///////////// Try \begin{figure}[!htb]. In nearly all cases it helps.
+            ///////////// !figh{pic.png}{Text info}{ref for cite}
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'f' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'g' )
+            if ( fetchline[4] == 'h' )
+            if ( fetchline[5] == '{' )
+            {
+	      if ( strcount( fetchline, '}' ) >= 2 )
+	      {
+ 	        fputs( "\\begin{figure}[!htb]\n" , fp5 );
+ 	        fputs( "\\centering\n" , fp5 );
+ 	        fputs( "\\includegraphics[height=0.33\\textheight,keepaspectratio]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+
+ 	        fputs( "\\caption{" , fp5 );
+	        fputs( strtxt2tex( strdelimit(  fetchline  ,  '{' ,'}' , 2 ) ) , fp5 );
+  	        fputs( "}\n", fp5 );
+
+ 	        fputs( "\\end{figure}\n" , fp5 );
+	      }
+	      else //normal
+	      {
+  	        fputs( "\\begin{center}\n", fp5 );
+  	        fputs( "\\includegraphics[height=1.0\\textheight]{" , fp5 );
+ 	        fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	        fputs( "}\n", fp5 );
+  	        fputs( "\\end{center}\n", fp5 );
+	      }
+  	      foundcode = 1;
+            }
+            ///////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+            ///////////// !unifig{myfigure.png} regular fig 
+            ///////////// the regular fig to place figures 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'u' )
+            if ( fetchline[2] == 'n' )
+            if ( fetchline[3] == 'i' )
+            if ( fetchline[4] == 'f' )
+            if ( fetchline[5] == 'i' )
+            if ( fetchline[6] == 'g' )
+            if ( fetchline[7] == '{' )
             {
 	      if ( strcount( fetchline, '}' ) >= 2 )
 	      {
@@ -3903,6 +4011,14 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+
+
+
+
+
+
+
+
 
 
 
@@ -6178,8 +6294,9 @@ int main( int argc, char *argv[])
             fputs( "//!gpath{figs}\n", fpout );
             fputs( "!ipath{~/pool/mrkdir/}\n", fpout );
             fputs( "//\\usepackage{gensymb}\n", fpout );  // for the degree 
-            fputs( "//\\usepackage[margin=0.5cm]{geometry}\n", fpout );
             fputs( "//\\pagestyle{headings}\n", fpout );
+            fputs( "//\\usepackage[margin=0.5cm]{geometry}\n", fpout );
+            fputs( "//!placeins\n", fpout );
             fputs( "!begin\n", fpout );
             fputs( "//!bold Example \n", fpout );
             fputs( "//\\begin{center}\n", fpout );
@@ -6270,7 +6387,22 @@ int main( int argc, char *argv[])
 
 }
 
-/// \setcounter{section}{0}
+
+
+/*
+Unterlagen (2 pics per page):
+!tex
+!gfx
+!utf
+!placeins
+!packages
+!begin
+!clr
+!section Header Name
+!figh{figs/pic1.png}{Picture 1}{ }
+!figh{figs/pic2.png}{Picture 2}{ }
+!enddoc
+*/
 
 
 
