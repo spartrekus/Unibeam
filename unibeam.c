@@ -1485,6 +1485,39 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+
+
+            /// !nqu 
+            if ( foundcode == 0 )  
+            if ( beamercode == 0 ) 
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'n' )
+            if ( fetchline[2] == 'q' )
+            if ( fetchline[3] == 'u' )
+            if ( fetchline[4] == ' ' )
+            {
+	      if ( numberinglevel == 2)  
+	      {
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+	      else if ( numberinglevel == 1)  
+	      {
+ 	        fputs( "\\begin{enumerate}\n" , fp5 );
+ 	        fputs( "\\item " , fp5 );
+ 	        fputs( strtrim( strcut( fetchline, 4+2, strlen(fetchline))) , fp5 );
+ 	        fputs( "\n" , fp5 );
+		numberinglevel = 2;
+                list_numbering++;
+	      }
+  	      foundcode = 1;
+            }
+
+
+
             /////////////////////////////////
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
@@ -2037,6 +2070,23 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "}\n", fp5 );
   	      foundcode = 1;
             }
+
+
+            //////////////////////////////////
+            //// !pdfpage 
+            if ( foundcode  == 0 )
+            if ( fetchline[0] == '!' ) // for left at 0 char pos
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'd' )
+            if ( fetchline[3] == 'f' )
+            if ( fetchline[4] == 'p' )
+            if ( fetchline[5] == 'a' )
+            if ( fetchline[6] == 'g' )
+            if ( fetchline[7] == 'e' )
+            {
+       	         fputs( "\\usepackage{pdfpages}\n" , fp5 );
+  	         foundcode = 1;
+            } 
 
 
             //////////////////////////////////
@@ -3089,8 +3139,7 @@ void nfileunimark( char *fileout, char *filein )
               foxy++;//
               strncpy( slidebufferdata[foxy] , "" , PATH_MAX );
               strncat( slidebufferdata[foxy], 
- 	      strtrim( strcut( fetchline, 4+2, strlen( fetchline ))) 
-              , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
+ 	      strtrim( strcut( fetchline, 4+2, strlen( fetchline ))) , PATH_MAX - strlen( slidebufferdata[foxy]  ) -1 );
               ///////////////
   	      foundcode = 1;
             }
@@ -3877,7 +3926,7 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[8] == ' ' ) 
             {
  	      fputs( strtxt2tex(  strcut( fetchline , 8+2, strlen(fetchline ))) , fp5 );
- 	      fputs( strcut( fetchline, 8+2, strlen(fetchline)) , fp5 );
+ 	      //fputs( strcut( fetchline, 8+2, strlen(fetchline)) , fp5 );
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             }
@@ -4831,6 +4880,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
             /// new mysection
             // (why !, because it can be into the standard 250 chars)  
             if ( foundcode == 0 )
@@ -5473,6 +5523,23 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+            ///////////// !gpath{ath.png}
+            if ( foundcode == 0 ) // security mode
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'g' )
+            if ( fetchline[2] == 'p' )
+            if ( fetchline[3] == 'a' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == 'h' )
+            if ( fetchline[6] == '{' )
+            {
+              fputs( "%%%%%% !gpath-(2)\n", fp5 );
+              fputs( "\\graphicspath{{", fp5 );
+ 	      fputs( strdelimit( fetchline,  '{' ,'}' ,  1 ) , fp5 );
+  	      fputs( "}}", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
 
 
 
@@ -6151,6 +6218,7 @@ int main( int argc, char *argv[])
 
 
 
+  /*
    ///////////////////////////////////////////
    ///////////////////////////////////////////
     if ( argc == 3)
@@ -6173,6 +6241,43 @@ int main( int argc, char *argv[])
           fclose( fpout );
           return 0;
       } 
+   */
+
+
+
+
+   ///////////////////////////////////////////
+   ///////////////////////////////////////////
+    if ( argc == 3)
+      if ( strcmp( argv[ 1 ] , "--new"  ) == 0  )
+      if ( strcmp( argv[ 2 ] , "exam"  ) == 0 ) 
+      {
+          printf( "Create example of exam (exam.mrk)\n");
+          fpout = fopen( "exam.mrk" , "ab+");
+             fputs( "\n", fpout );
+             fputs( "\n", fpout );
+             //fputs( "!input{header.mrk}\n", fpout );
+             //fputs( "!utf\n", fpout );
+             //fputs( "!packages\n", fpout );
+             ////fputs( "!begin\n", fpout );
+             //fputs( "!bull Area\n", fpout );
+             //fputs( "!im Question 1\n", fpout );
+             //fputs( "!im Question 2\n", fpout );
+             fputs( "#include{exam.mrk}\n", fpout );
+             fputs( "!gfx\n", fpout );
+             fputs( "!packages\n", fpout );
+             fputs( "!utf\n", fpout );
+             fputs( "!gpath{~/pool/figs/}\n", fpout );
+             fputs( "!begin\n", fpout );
+             fputs( "!exam+\n", fpout );
+             fputs( "\n", fpout );
+             fputs( "\n", fpout );
+          fclose( fpout );
+          return 0;
+      } 
+
+
+
 
 
 
