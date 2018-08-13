@@ -2308,9 +2308,11 @@ void nfileunimark( char *fileout, char *filein )
 
 
             //////////////////
+            //// #include{file.mrk}
+            //////////////////
             if ( foundcode == 0 )
-	    if ( 
-            ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' ) )
+	    //if ( ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' ) )
+	    if ( (  fetchline[0] ==  '#' )
             && ( fetchline[1] == 'i' )
             && ( fetchline[2] == 'n' )
             && ( fetchline[3] == 'c' )
@@ -5329,7 +5331,8 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[4] == ' ' ) 
             ///////// new! for review !rev my-review
             {
-       	         fputs( "\\textcolor{red}{\\hl{" , fp5 );
+       	         //fputs( "\\textcolor{red}{\\hl{" , fp5 );
+       	         fputs( "\\textcolor{blue}{\\hl{" , fp5 );
         	 fputs( "[", fp5 );
        	         fputs( strcut( fetchline, 4+2, strlen(fetchline)) , fp5 );
         	 fputs( "]", fp5 );
@@ -5357,9 +5360,6 @@ void nfileunimark( char *fileout, char *filein )
         	 fputs( "\n", fp5 );
   	         foundcode = 1;
             }
-
-
-
 
 
 
