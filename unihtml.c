@@ -129,6 +129,33 @@ void filecat(  char *filein )
 	      //printf( "%d: %s", linecounter++, fetchline );
 	      //printf( "\n" );
 
+              if ( fetchline[0] == '!' )
+              if ( fetchline[1] == 't' )
+              if ( fetchline[2] == 'e' )
+              if ( fetchline[3] == 'x' )
+              {
+              }
+
+              if ( fetchline[0] == '!' )
+              if ( fetchline[1] == 'p' )
+              if ( fetchline[2] == 'a' )
+              if ( fetchline[3] == 'c' )
+              if ( fetchline[4] == 'k' )
+              if ( fetchline[5] == 'a' )
+              if ( fetchline[6] == 'g' )
+              if ( fetchline[7] == 'e' )
+              {
+              }
+
+              if ( fetchline[0] == '!' )
+              if ( fetchline[1] == 'b' )
+              if ( fetchline[2] == 'e' )
+              if ( fetchline[3] == 'g' )
+              if ( fetchline[4] == 'i' )
+              if ( fetchline[5] == 'n' )
+              {
+              }
+
 
               if ( fetchline[0] == '!' )
               if ( fetchline[1] == 'p' )

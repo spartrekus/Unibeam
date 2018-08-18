@@ -3432,6 +3432,20 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+            // !hline  some html 
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'h' )
+            if ( fetchline[2] == 'l' )
+            if ( fetchline[3] == 'i' )
+            if ( fetchline[4] == 'n' )
+            if ( fetchline[5] == 'e' )
+            {
+ 	      fputs( "\\clearpage" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
 
 
 
