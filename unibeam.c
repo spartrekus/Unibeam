@@ -1824,6 +1824,35 @@ void nfileunimark( char *fileout, char *filein )
 
 
             /////////////////////////////////////
+            /// for !centerline 
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'c' )
+            if ( fetchline[2] == 'e' )
+            if ( fetchline[3] == 'n' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == 'e' )
+            if ( fetchline[6] == 'r' )
+            if ( fetchline[7] == 'l' )
+            if ( fetchline[8] == 'i' )
+            if ( fetchline[9] == 'n' )
+            if ( fetchline[10] == 'e' )
+            if ( fetchline[11] == ' ' )
+            {
+              fputs( "\\begin{center}\n" , fp5 );
+ 	      fputs( strcut( fetchline, 11+2, strlen(  fetchline ))    , fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+              fputs( "\\end{center}\n" , fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+            /////////////////////////////////////
             /// for CSV or tables !!!!!!!!!!!!  !csv for tables
             /////////////////////////////////////
             if ( foundcode == 0 )
@@ -5332,11 +5361,13 @@ void nfileunimark( char *fileout, char *filein )
             ///////// new! for review !rev my-review
             {
        	         //fputs( "\\textcolor{red}{\\hl{" , fp5 );
-       	         fputs( "\\textcolor{blue}{\\hl{" , fp5 );
+       	         //fputs( "\\textcolor{blue}{\\hl{" , fp5 );
+       	         fputs( "\\textcolor{blue}{" , fp5 );
         	 fputs( "[", fp5 );
        	         fputs( strcut( fetchline, 4+2, strlen(fetchline)) , fp5 );
         	 fputs( "]", fp5 );
-        	 fputs( "}}", fp5 );
+        	 //fputs( "}}", fp5 );
+        	 fputs( "}", fp5 );
         	 fputs( "\n", fp5 );
   	         foundcode = 1;
             }

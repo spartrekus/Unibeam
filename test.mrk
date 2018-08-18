@@ -1,0 +1,24 @@
+
+
+!= title hello 
+!== subhello 1
+hello world
+hello world
+hello world
+hello world
+hello world
+!url http://www.google.com
+!fig https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/204px-Tux.svg.png
+!line hello world
+!line hello world
+!line hello world
+
+
+!hline
+!== subhello 2
+!fig https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/204px-Tux.svg.png
+!para Hello world
+!para Hello world
+!para Hello world
+!para Hello world
+
