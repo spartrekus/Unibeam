@@ -300,7 +300,7 @@ char *strtxt2tex(char *str)
           ptr[j++]='{';
           ptr[j++]='>';
           ptr[j++]='}';
-          ptr[j++]=' ';
+          //ptr[j++]=' ';
 	}
 
         else if ( str[i] == '<' ) 
@@ -319,7 +319,7 @@ char *strtxt2tex(char *str)
           ptr[j++]='{';
           ptr[j++]='<';
           ptr[j++]='}';
-          ptr[j++]=' ';
+          //ptr[j++]=' ';
 	}
 
 
@@ -1004,53 +1004,38 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-	    /////////////////
-            // quick, easy review work with adding just #
-	    /////////////////
-            if ( foundcode == 0 ) // for review
-            if ( fetchlinetmp[0] == '#' ) // low-level
-            if ( fetchlinetmp[1] == ' ' )
-            { /*
- 	      fputs( "{\\color{blue}" , fp5 );
- 	      fputs( strcut( fetchlinetmp, 1+2, strlen(fetchlinetmp)) , fp5 );
-  	      fputs( "}", fp5 );
-  	      fputs( "\n", fp5 );*/
-       	         //fputs( "\\textcolor{blue}{\\hl{" , fp5 );
-       	         fputs( "\\hl{" , fp5 );
-        	 fputs( "[", fp5 );
-       	         fputs( strcut( fetchlinetmp , 1+2, strlen(fetchlinetmp)) , fp5 );
-        	 fputs( "]", fp5 );
-        	 fputs( "}", fp5 );
-        	 //fputs( "}}", fp5 );
-        	 fputs( "\n", fp5 );
-  	      foundcode = 1;
-            }
-
-
 
 
 	    /////////////////
             if ( foundcode == 0 ) // 
-            if ( fetchlinetmp[0] == '#' ) // low-level
-            if ( fetchlinetmp[1] != 'i' ) // different!!!
-            if ( fetchlinetmp[2] != 'n' )
-            if ( fetchlinetmp[3] != 'c' )
-            if ( fetchlinetmp[4] != 'l' )
-            if ( fetchlinetmp[5] != 'u' )
-            if ( fetchlinetmp[6] != 'd' )
-            if ( fetchlinetmp[7] != 'e' )
-            { /*
+            if ( fetchline[0] == '#' ) // low-level
+            //if ( fetchline[1] == ' ' ) // low-level
+            if ( fetchline[1] != 'i' ) // different!!!
+            if ( fetchline[2] != 'n' )
+            if ( fetchline[3] != 'c' )
+            if ( fetchline[4] != 'l' )
+            if ( fetchline[5] != 'u' )
+            if ( fetchline[6] != 'd' )
+            if ( fetchline[7] != 'e' )
+            {  
+              /*
  	      fputs( "{\\color{blue}" , fp5 );
  	      fputs( strcut( fetchlinetmp, 0+2, strlen(fetchlinetmp)) , fp5 );
   	      fputs( "}", fp5 );
   	      fputs( "\n", fp5 ); */
               //datecom-20180202-002359, color was changed from red to blue
-       	         fputs( "\\textcolor{blue}{\\hl{" , fp5 );
-        	 fputs( "[", fp5 );
-       	         fputs( strcut( fetchlinetmp, 0+2, strlen(fetchlinetmp)) , fp5 );
-        	 fputs( "]", fp5 );
-        	 fputs( "}}", fp5 );
-        	 fputs( "\n", fp5 );
+       	      //fputs( "\\textcolor{blue}{\\hl{" , fp5 );
+       	      fputs( "\\textcolor{blue}{" , fp5 );
+              fputs( "[", fp5 );
+       	      //fputs( strcut( fetchline, 0+2, strlen( fetchline )) , fp5 );
+              if ( txtrawcode == 1 )
+       	         fputs(  strtxt2tex(strcut( fetchline, 0+2, strlen(fetchline))) , fp5 );
+              else
+       	         fputs( strcut( fetchline, 0+2, strlen(fetchline)) , fp5 );
+              fputs( "]", fp5 );
+              //fputs( "}}", fp5 );
+              fputs( "}", fp5 );
+              fputs( "\n", fp5 );
   	      foundcode = 1;
             } 
 
@@ -1115,6 +1100,30 @@ void nfileunimark( char *fileout, char *filein )
 	    }
 
 
+
+
+
+
+	    /////////////////
+            // quick, easy review work with adding just #
+	    /////////////////
+            if ( foundcode == 0 ) // for review
+            if ( fetchline[0] == '#' ) // low-level
+            if ( fetchline[1] == ' ' )
+            {
+       	         fputs( "\\textcolor{blue}{" , fp5 );
+        	 fputs( "[", fp5 );
+                 if ( txtrawcode == 1 )
+       	            fputs( strtxt2tex(strcut( fetchline, 1+2, strlen(fetchline))) , fp5 );
+                 else
+       	            fputs( strcut( fetchline, 1+2, strlen(fetchline)) , fp5 );
+        	 fputs( "]", fp5 );
+        	 fputs( "}", fp5 );
+        	 fputs( "\n", fp5 );
+  	         foundcode = 1;
+            }
+
+
          
          /////// txtrawcode, activated with !beginraw
          // you may let this section
@@ -1122,7 +1131,6 @@ void nfileunimark( char *fileout, char *filein )
           {
              if ( fetchline[0] != '!' ) 
              if ( fetchline[0] != '>' ) 
-             //if ( fetchline[0] != '|' )  // there is only 2 modifiers
              {
                  strncpy( fetchlinefoo, fetchline , PATH_MAX );
                  strncpy( fetchline , strtxt2tex( fetchlinefoo ) , PATH_MAX );
@@ -1209,6 +1217,10 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
+
             if ( foundcode == 0 )
             if ( fetchline[0] == '#' )
             if ( strstr( fetchline, "#include" ) == 0 )
@@ -1260,6 +1272,8 @@ void nfileunimark( char *fileout, char *filein )
             {
     	      foundcode = 1;
             }
+
+
 
 
 
@@ -2340,8 +2354,8 @@ void nfileunimark( char *fileout, char *filein )
             //// #include{file.mrk}
             //////////////////
             if ( foundcode == 0 )
-	    //if ( ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' ) )
-	    if ( (  fetchline[0] ==  '#' )
+	    if ( ( (  fetchline[0] ==  '!' ) || (  fetchline[0] ==  '#' ) )
+	    //if ( (  fetchline[0] ==  '#' )
             && ( fetchline[1] == 'i' )
             && ( fetchline[2] == 'n' )
             && ( fetchline[3] == 'c' )
@@ -4789,6 +4803,7 @@ void nfileunimark( char *fileout, char *filein )
             /////////////////////////////
             /////////////////////////////
             /////////////////////////////
+         /*
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == '[' )
@@ -4816,6 +4831,7 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
+            */
 
 
 
@@ -5374,37 +5390,15 @@ void nfileunimark( char *fileout, char *filein )
             if ( fetchline[4] == ' ' ) 
             ///////// new! for review !rev my-review
             {
-       	         //fputs( "\\textcolor{red}{\\hl{" , fp5 );
-       	         //fputs( "\\textcolor{blue}{\\hl{" , fp5 );
        	         fputs( "\\textcolor{blue}{" , fp5 );
         	 fputs( "[", fp5 );
        	         fputs( strcut( fetchline, 4+2, strlen(fetchline)) , fp5 );
         	 fputs( "]", fp5 );
-        	 //fputs( "}}", fp5 );
         	 fputs( "}", fp5 );
         	 fputs( "\n", fp5 );
   	         foundcode = 1;
             }
 
-
-
-            ////////////////
-            if ( foundcode == 0 )
-            if ( fetchline[0] == '!' )
-            if ( fetchline[1] == 'c' ) 
-            if ( fetchline[2] == 'o' )
-            if ( fetchline[3] == 'm' ) 
-            if ( fetchline[4] == ' ' ) 
-            ///////// new! for review !rev my-review
-            {
-       	         fputs( "\\textcolor{red}{\\hl{" , fp5 );
-        	 fputs( "[", fp5 );
-       	         fputs( strcut( fetchline, 4+2, strlen(fetchline)) , fp5 );
-        	 fputs( "]", fp5 );
-        	 fputs( "}}", fp5 );
-        	 fputs( "\n", fp5 );
-  	         foundcode = 1;
-            }
 
 
 
