@@ -1349,6 +1349,9 @@ void nfileunimark( char *fileout, char *filein )
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( markup_output_format == 8 ) 
+            // int markup_output_format = 1; // type of doc: 1:tex, 2:html, 3:exam (pts), 4:book, 5:opendoc , 6:exam+ (with points) new and testing,    7: for maths with enumitem,  8: exam list i.e. the first approach, stable (exam in english), 
+            // 6 is exam+, but above 8 is exam (regular one)
+            // 6 is actually nicer to use.
             if ( fetchline[1] == 'q' ) // used for english type of questions (single question list, with pts)
             if ( fetchline[2] == 'u' )
             if ( fetchline[3] == ' ' )
@@ -1461,6 +1464,9 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
+
+
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
             ///////////////////////////////////////////////
@@ -1478,7 +1484,7 @@ void nfileunimark( char *fileout, char *filein )
  	        fputs( "\\item " , fp5 );
  	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
                 if      ( markup_language == 4 )    fputs( " (3 points)" , fp5 );
-                else if ( markup_language == 3 )    fputs( " (3 Pkt.)}" , fp5 );
+                else if ( markup_language == 3 )    fputs( " (3 Pkt.)" , fp5 );
                 else if ( markup_language == 1 )    fputs( " (3 points)" , fp5 );
                 else fputs( " (3 Pkt.)" , fp5 );
  	        fputs( "\n" , fp5 );
@@ -1492,7 +1498,7 @@ void nfileunimark( char *fileout, char *filein )
  	        fputs( strtrim( strcut( fetchline, 3+2, strlen(fetchline))) , fp5 );
                 if      ( markup_language == 4 )    fputs( " (3 points)" , fp5 );
                 else if ( markup_language == 1 )    fputs( " (3 points)" , fp5 );
-                else if ( markup_language == 3 )    fputs( " (3 Pkt.)}" , fp5 );
+                else if ( markup_language == 3 )    fputs( " (3 Pkt.)" , fp5 );
                 else fputs( " (3 Pkt.)" , fp5 );
  	        fputs( "\n" , fp5 );
 		numberinglevel = 2;
@@ -1599,8 +1605,6 @@ void nfileunimark( char *fileout, char *filein )
 	      }
   	      foundcode = 1;
             }
-
-
 
 
 
@@ -1745,6 +1749,9 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+
+
+
             // !date text 
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
@@ -1819,6 +1826,27 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+
+
+            /////////////////////////////////////
+            /// for !texct  for content for tables, whtout lnfeed and without converting 
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 't' )
+            if ( fetchline[2] == 'e' )
+            if ( fetchline[3] == 'x' )
+            if ( fetchline[4] == 'c' )
+            if ( fetchline[5] == 't' )
+            if ( fetchline[6] == ' ' )
+            {
+ 	      fputs( strcut( fetchline , 6+2, strlen(  fetchline ))    , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
+
+
             /////////////////////////////////////
             /// for !line 
             /////////////////////////////////////
@@ -1836,6 +1864,7 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             }
+
 
 
             /////////////////////////////////////
@@ -2413,7 +2442,7 @@ void nfileunimark( char *fileout, char *filein )
 	    /////////////////
             /// for easy raw to tex work
             ////////////////
-            /*
+            // start with '|' and it will make no linefeed
             if ( foundcode == 0 )
             if ( fetchline[0] == '|' )
             if ( fetchline[1] == ' ' )    //<- this help to have nice code
@@ -2423,7 +2452,7 @@ void nfileunimark( char *fileout, char *filein )
   	      //  fputs( "\\", fp5 );
   	      fputs( "\n", fp5 );
   	      foundcode = 1; 
-            } */
+            } 
  
 
             /////////////////////////////////////
@@ -2584,8 +2613,34 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
-
-
+   // !fild
+   ////////////////////////////////////
+   // beamer starts here 
+   if ( foundcode == 0 )
+   if ( beamercode == 1 )
+   {
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'f' )
+            if ( fetchline[2] == 'i' )
+            if ( fetchline[3] == 'l' )
+            if ( fetchline[4] == 'd' )
+            if ( fetchline[5] == ' ' )
+            {
+                fputs( "\\begin{frame}\n" , fp5);
+                fputs( "\\fitimage{\n" , fp5);
+                fputs( "\\frametitle{\\thesection.~\\insertsection}\n" , fp5 );
+                fputs( "\\begin{itemize}\n", fp5 );
+                fputs( "\\item ", fp5 );
+     	        fputs( strtxt2tex( strtrim( strcut( fetchline, 5+2, strlen( fetchline )))) , fp5 );
+                fputs( "\n", fp5 );
+                fputs( "\\end{itemize}\n", fp5 );
+                fputs( "}{", fp5 );
+     	        fputs( strtrim( strcut( fetchline, 5+2, strlen( fetchline ))) , fp5 );
+                fputs( "}[]\n" , fp5 );
+                fputs( "\\end{frame}\n" , fp5 );
+  	        foundcode = 1;
+            }
+   }
 
 
    ////////////////////////////////////
@@ -5551,6 +5606,33 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             }
+
+       
+
+
+
+          /*
+            //// ! clr ! Bigskip from converting
+            if ( foundcode == 0 )
+            if ( fetchcmdline[0] == '!' ) 
+	    if ( strcmp( fetchcmdline, "! clr" ) == 0 ) //here begin
+            {
+ 	      fputs( "\\clearpage" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+            //// ! clr ! Bigskip from converting
+            if ( foundcode == 0 )
+            if ( fetchcmdline[0] == '!' ) 
+	    if ( strcmp( fetchcmdline, "! Bigskip" ) == 0 ) //here begin
+            {
+ 	      fputs( "\\bigskip" , fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+         */
+
+
 
 
 
