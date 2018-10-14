@@ -1692,6 +1692,7 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+            /// !inputline{ }
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == 'i' )
@@ -1785,6 +1786,16 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+            // !| force raw mode for given area/line
+            if ( foundcode == 0 )
+            if (( fetchline[0] == '!' )
+            && ( fetchline[1] ==  '|' )
+            && ( fetchline[2] ==  ' ' ) )
+            {
+ 	      fputs(  strtxt2tex( strcut( fetchline, 2+2, strlen( fetchline)) ) , fp5 );
+  	      foundcode = 1;
+            }
+
 
             // !title text 
             if ( foundcode == 0 )
@@ -1865,6 +1876,29 @@ void nfileunimark( char *fileout, char *filein )
   	      foundcode = 1;
             }
 
+
+
+            /////////////////////////////////////
+            /// for !cline text (for quick center line)
+            /////////////////////////////////////
+            if ( foundcode == 0 )
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'c' )
+            if ( fetchline[2] == 'l' )
+            if ( fetchline[3] == 'i' )
+            if ( fetchline[4] == 'n' )
+            if ( fetchline[5] == 'e' )
+            if ( fetchline[6] == ' ' )
+            {
+              fputs( "\\begin{center}\n" , fp5 );
+ 	      //fputs( strtext2tex(   strcut( fetchline, 6+2, strlen(  fetchline ))    ) , fp5 );
+ 	      fputs(  strcut( fetchline, 6+2, strlen(  fetchline ))    , fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\\", fp5 );
+  	      fputs( "\n", fp5 );
+              fputs( "\\end{center}\n" , fp5 );
+  	      foundcode = 1;
+            }
 
 
             /////////////////////////////////////
@@ -2037,9 +2071,166 @@ void nfileunimark( char *fileout, char *filein )
  	      fputs( "\n" , fp5 );
  	      fputs( "\\usepackage{url}\n" , fp5 );
  	      fputs( "\\usepackage{hyperref}\n" , fp5 );
- 	      fputs( "\\usepackage{graphicx}\n" , fp5 );
  	      fputs( "\\usepackage{grffile}\n" , fp5 );
+ 	      fputs( "\\usepackage{graphicx}\n" , fp5 );
  	      fputs( "\\usepackage{xcolor}\n" , fp5 );
+ 	      fputs( "\n" , fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+            if ( foundcode == 0 )   // !thankyou (easy addon)
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 't' )
+            if ( fetchline[2] == 'h' )
+            if ( fetchline[3] == 'a' )
+            if ( fetchline[4] == 'n' )
+            if ( fetchline[5] == 'k' )
+            if ( fetchline[6] == 'y' )
+            if ( fetchline[7] == 'o' )
+            if ( fetchline[8] == 'u' )
+            {
+              fputs( "\\clearpage", fp5 );
+              fputs( "\\begin{frame}", fp5 );
+              fputs( "\\vspace{3.3cm}", fp5 );
+              fputs( "\\begin{center}", fp5 );
+              fputs( "{\\fontsize{30}{40}\\selectfont {\\it Thank you for your attention}}", fp5 );
+              fputs( "\\end{center}", fp5 );
+              fputs( "\\end{frame}", fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+
+
+            /////////////////////////////////////////
+            /////////////////////////////////////////
+            /////////////////////////////////////////
+            if ( foundcode == 0 )   // !postit   
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 's' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == 'i' )
+            if ( fetchline[6] == 't' )
+            {
+ 	      //fputs( "\n" , fp5 );
+              /// to cont
+ 	      //fputs( "\n" , fp5 );
+  	      foundcode = 1;
+            }
+
+
+            /////////////////////////////////////////
+            if ( foundcode == 0 )   // !reset section
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'r' )
+            if ( fetchline[2] == 'e' )
+            if ( fetchline[3] == 's' )
+            if ( fetchline[4] == 'e' )
+            if ( fetchline[5] == 't' )
+	    if ( strcmp( fetchcmdline, "!reset section" ) == 0 )
+            {
+                 fputs(  "\n" , fp5 );
+                 fputs( "\\setcounter{section}{0}", fp5 );
+  	         fputs( "\n", fp5 );
+  	         foundcode = 1;
+            }
+
+
+
+
+            /////////////////////////////////////////
+            if ( foundcode == 0 )   // !part text
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'p' )
+            if ( fetchline[2] == 'a' )
+            if ( fetchline[3] == 'r' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == ' ' )
+            {
+ 	      fputs( "\\noindent\n" , fp5 );
+ 	      fputs( "\\textit{" , fp5 );
+ 	      fputs( "{\\bfseries " , fp5 );
+ 	      fputs( strcut( fetchline, 5+2, strlen(fetchline)) , fp5 );
+  	      fputs( "}", fp5 );
+  	      fputs( "}", fp5 );
+  	      fputs( "\\\\", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+
+            /////////////////////////////////////////
+            if ( foundcode == 0 )   // !doc   <- auto document   
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'd' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 'c' )
+	    if ( strcmp( fetchcmdline, "!doc" ) == 0 )
+            {
+                 fputs(  "\n" , fp5 );
+                 fputs( "\\documentclass[11pt]{article}", fp5 );
+  	         fputs( "\n", fp5 );
+ 	         fputs( "\\usepackage{grffile}\n" , fp5 );
+ 	         fputs( "\\usepackage{graphicx}\n" , fp5 );
+ 	         fputs( "\\usepackage{xcolor}\n" , fp5 );
+     	         fputs( "\n", fp5 );
+                 fputs( "\\usepackage[utf8]{inputenc}\n", fp5 );
+     	         fputs( "\n", fp5 );
+  	         fputs( "\n", fp5 );
+                 fputs(  "\\begin{document}\n" , fp5 );
+                 fputs(  "\n" , fp5 );
+  	         foundcode = 1;
+            }
+            /////////////////////////////////////////
+            if ( foundcode == 0 )   // !book   <- auto document   
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'b' )
+            if ( fetchline[2] == 'o' )
+            if ( fetchline[3] == 'o' )
+            if ( fetchline[4] == 'k' )
+	    if ( strcmp( fetchcmdline, "!book" ) == 0 )
+            {
+                 fputs(  "\n" , fp5 );
+                 fputs( "\\documentclass[11pt]{book}", fp5 );
+  	         fputs( "\n", fp5 );
+ 	         fputs( "\\usepackage{grffile}\n" , fp5 );
+ 	         fputs( "\\usepackage{graphicx}\n" , fp5 );
+ 	         fputs( "\\usepackage{xcolor}\n" , fp5 );
+  	         fputs( "\n", fp5 );
+                 fputs(  "\\begin{document}\n" , fp5 );
+                 fputs(  "\n" , fp5 );
+  	         foundcode = 1;
+            }
+
+
+
+
+
+            /////////////////////////////////////////
+            /////////////////////////////////////////
+            /////////////////////////////////////////
+            if ( foundcode == 0 )   // !epstopdf  
+            if ( fetchline[0] == '!' ) 
+            if ( fetchline[1] == 'e' )
+            if ( fetchline[2] == 'p' )
+            if ( fetchline[3] == 's' )
+            if ( fetchline[4] == 't' )
+            if ( fetchline[5] == 'o' )
+            if ( fetchline[6] == 'p' )
+            if ( fetchline[7] == 'd' )
+            if ( fetchline[8] == 'f' )
+            {
+ 	      fputs( "\n" , fp5 );
+ 	      fputs( "\\usepackage{epstopdf}\n" , fp5 );
  	      fputs( "\n" , fp5 );
   	      foundcode = 1;
             }
@@ -5144,7 +5335,7 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
-	    ////
+	    ////  function !chapter text
             if ( foundcode == 0 )
             if ( fetchline[0] == '!' )
             if ( fetchline[1] == 'c' )
@@ -5179,6 +5370,18 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 
+            if ( foundcode == 0 ) // !it text
+            if ( fetchline[0] == '!' )
+            if ( fetchline[1] == 'i' )
+            if ( fetchline[2] == 't' )
+            if ( fetchline[3] == ' ' )
+            {
+ 	      fputs( "\\textit{" , fp5 );
+ 	      fputs( strcut( fetchline, 3+2, strlen(fetchline)) , fp5 );
+  	      fputs( "}", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
 
 
 	    /////////////////
@@ -5292,6 +5495,22 @@ void nfileunimark( char *fileout, char *filein )
             }
 
 	    /////////////////
+            if ( foundcode == 0 ) // !bd text
+            if ( fetchcmdline[0] == '!' )
+            if ( fetchcmdline[1] == 'b' )
+            if ( fetchcmdline[2] == 'd' )
+            if ( fetchcmdline[3] == ' ' )
+            {
+ 	      fputs( "{\\bfseries " , fp5 );
+ 	      fputs( strcut( fetchcmdline, 3+2, strlen(fetchcmdline)) , fp5 );
+  	      fputs( "}", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
+
+
+	    /////////////////
             if ( foundcode == 0 ) // !boldline, without line feed of tex !
             if ( fetchcmdline[0] == '!' )
             if ( fetchcmdline[1] == 'b' )
@@ -5313,6 +5532,7 @@ void nfileunimark( char *fileout, char *filein )
 
 
 
+
 	    /////////////////
 	    /////////////////
 	    /////////////////
@@ -5331,6 +5551,25 @@ void nfileunimark( char *fileout, char *filein )
   	      fputs( "\n", fp5 );
   	      foundcode = 1;
             }
+
+	    /////////////////
+	    /////////////////
+	    /////////////////
+            if ( foundcode == 0 ) // !pink 
+            if ( fetchcmdline[0] == '!' )
+            if ( fetchcmdline[1] == 'p' )
+            if ( fetchcmdline[2] == 'i' )
+            if ( fetchcmdline[3] == 'n' )
+            if ( fetchcmdline[4] == 'k' )
+            if ( fetchcmdline[5] == ' ' )
+            {
+ 	      fputs( "{\\color{mypink}" , fp5 );
+ 	      fputs( strcut( fetchcmdline, 5+2, strlen(fetchcmdline)) , fp5 );
+  	      fputs( "}", fp5 );
+  	      fputs( "\n", fp5 );
+  	      foundcode = 1;
+            }
+
 
 	    /////////////////
 	    /////////////////
